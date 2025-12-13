@@ -2,46 +2,51 @@ export default function AboutPage() {
   return (
     <div className="bg-white">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#008C5A] to-[#006B47] text-white py-20 text-center overflow-hidden">
-        <div className="absolute top-10 right-10 w-64 h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl animate-float"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-6xl font-bold mb-4 animate-fade-in-up">About Swift Response</h1>
-          <p className="text-xl opacity-95 max-w-3xl mx-auto animate-fade-in-up" style={{animationDelay: '100ms'}}>
+      <section className="relative relative min-h-screen flex items-center justify-center bg-gradient-to-br from-[#008C5A] to-[#006B47] text-white overflow-hidden">
+        <div className="absolute top-10 right-10 w-64 h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl animate-float hidden md:block"></div>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center py-16 sm:py-20">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 animate-fade-in-up">About Swift Response</h1>
+          <p className="text-base sm:text-lg md:text-xl opacity-95 max-w-3xl mx-auto animate-fade-in-up px-4" style={{animationDelay: '100ms'}}>
             Empowering communities to respond effectively during emergencies
           </p>
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto py-16 px-4">
+      <div className="max-w-6xl mx-auto py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
         {/* Mission Section */}
-        <section className="mb-20">
-          <h2 className="text-4xl font-bold text-[#333333] mb-6 text-center">Our Mission</h2>
-          <div className="glass p-10 rounded-3xl max-w-4xl mx-auto">
-            <p className="text-lg text-gray-700 leading-relaxed text-center">
-              The main purpose of this website is to create a real-time, community-driven emergency response system 
-              that connects people in need with volunteers, hospitals, shelters, and resources. This platform solves 
-              the problem of information gaps during disasters (floods, earthquakes, medical emergencies, fires) by 
-              providing verified, up-to-date information and coordinating rapid response efforts.
-            </p>
+        <section className="min-h-screen flex items-center justify-center py-16 sm:py-20">
+          <div className="w-full">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#333333] mb-6 text-center">Our Mission</h2>
+            <div className="glass p-6 sm:p-8 md:p-10 rounded-3xl max-w-4xl mx-auto">
+              <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed text-center">
+                The main purpose of this website is to create a real-time, community-driven emergency response system 
+                that connects people in need with volunteers, hospitals, shelters, and resources. This platform solves 
+                the problem of information gaps during disasters (floods, earthquakes, medical emergencies, fires) by 
+                providing verified, up-to-date information and coordinating rapid response efforts.
+              </p>
+            </div>
           </div>
         </section>
 
         {/* Vision Section */}
-        <section className="mb-20">
-          <h2 className="text-4xl font-bold text-[#333333] mb-6 text-center">Our Vision</h2>
-          <div className="glass p-10 rounded-3xl max-w-4xl mx-auto">
-            <p className="text-lg text-gray-700 leading-relaxed text-center">
-              To build a world where no one faces emergencies alone. We envision a future where technology bridges 
-              the gap between those in need and those who can help, creating resilient communities that can respond 
-              swiftly and effectively to any crisis.
-            </p>
+        <section className="min-h-screen flex items-center justify-center py-16 sm:py-20">
+          <div className="w-full">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#333333] mb-6 text-center">Our Vision</h2>
+            <div className="glass p-6 sm:p-8 md:p-10 rounded-3xl max-w-4xl mx-auto">
+              <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed text-center">
+                To build a world where no one faces emergencies alone. We envision a future where technology bridges 
+                the gap between those in need and those who can help, creating resilient communities that can respond 
+                swiftly and effectively to any crisis.
+              </p>
+            </div>
           </div>
         </section>
 
         {/* Values Section */}
-        <section className="mb-20">
-          <h2 className="text-4xl font-bold text-[#333333] mb-12 text-center">Our Values</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <section className="min-h-screen flex items-center justify-center py-16 sm:py-20">
+          <div className="w-full">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#333333] mb-8 sm:mb-12 text-center">Our Values</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {[
               {
                 icon: '🤝',
@@ -76,27 +81,29 @@ export default function AboutPage() {
             ].map((value, index) => (
               <div 
                 key={value.title}
-                className="glass p-8 rounded-2xl hover:-translate-y-2 transition-all duration-300 group"
+                className="glass p-6 sm:p-8 rounded-2xl hover:-translate-y-2 transition-all duration-300 group active:scale-95 cursor-pointer"
                 style={{animationDelay: `${index * 100}ms`}}
               >
-                <div className="text-5xl mb-4 group-hover:scale-125 transition-transform duration-300">
+                <div className="text-4xl sm:text-5xl mb-4 group-hover:scale-125 transition-transform duration-300">
                   {value.icon}
                 </div>
-                <h3 className="text-2xl font-bold text-[#333333] mb-3 group-hover:text-[#008C5A] transition-colors">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#333333] mb-3 group-hover:text-[#008C5A] transition-colors">
                   {value.title}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                   {value.description}
                 </p>
               </div>
             ))}
           </div>
+          </div>
         </section>
 
         {/* Who We Serve Section */}
-        <section className="mb-20">
-          <h2 className="text-4xl font-bold text-[#333333] mb-12 text-center">Who We Serve</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <section className="min-h-screen flex items-center justify-center py-16 sm:py-20">
+          <div className="w-full">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#333333] mb-8 sm:mb-12 text-center">Who We Serve</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
             {[
               {
                 icon: '🆘',
@@ -121,21 +128,23 @@ export default function AboutPage() {
             ].map((audience, index) => (
               <div 
                 key={audience.title}
-                className="bg-gradient-to-br from-white to-[#F8F9FA] p-8 rounded-2xl border-2 border-[#E9ECEF] hover:border-[#008C5A] hover:shadow-xl transition-all duration-300"
+                className="bg-gradient-to-br from-white to-[#F8F9FA] p-6 sm:p-8 rounded-2xl border-2 border-[#E9ECEF] hover:border-[#008C5A] hover:shadow-xl transition-all duration-300 active:scale-95 cursor-pointer"
                 style={{animationDelay: `${index * 100}ms`}}
               >
-                <div className="text-4xl mb-4">{audience.icon}</div>
-                <h3 className="text-2xl font-bold text-[#333333] mb-3">{audience.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{audience.description}</p>
+                <div className="text-3xl sm:text-4xl mb-4">{audience.icon}</div>
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#333333] mb-3">{audience.title}</h3>
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{audience.description}</p>
               </div>
             ))}
+          </div>
           </div>
         </section>
 
         {/* Team Section */}
-        <section className="mb-12">
-          <h2 className="text-4xl font-bold text-[#333333] mb-12 text-center">Our Team</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <section className="min-h-screen flex items-center justify-center py-16 sm:py-20">
+          <div className="w-full">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#333333] mb-8 sm:mb-12 text-center">Our Team</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {[
               { name: 'Nosherwan Tahir', role: 'Team Lead', expertise: 'Project Management' },
               { name: 'Muhammad Raza Khan', role: 'Developer', expertise: 'Full Stack Development' },
@@ -143,22 +152,24 @@ export default function AboutPage() {
             ].map((member, index) => (
               <div 
                 key={member.name}
-                className="glass p-8 rounded-2xl text-center hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group"
+                className="glass p-6 sm:p-8 rounded-2xl text-center hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group active:scale-95 cursor-pointer"
                 style={{animationDelay: `${index * 100}ms`}}
               >
-                <div className="w-24 h-24 bg-gradient-to-br from-[#008C5A] to-[#00A366] rounded-full mx-auto mb-6 flex items-center justify-center text-white text-3xl font-bold group-hover:scale-110 transition-transform">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-[#008C5A] to-[#00A366] rounded-full mx-auto mb-4 sm:mb-6 flex items-center justify-center text-white text-2xl sm:text-3xl font-bold group-hover:scale-110 transition-transform">
                   {member.name.split(' ').map(n => n[0]).join('')}
                 </div>
-                <h3 className="text-2xl font-bold text-[#333333] mb-2 group-hover:text-[#008C5A] transition-colors">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#333333] mb-2 group-hover:text-[#008C5A] transition-colors">
                   {member.name}
                 </h3>
-                <p className="text-[#FFD700] font-semibold mb-2">{member.role}</p>
-                <p className="text-gray-600">{member.expertise}</p>
+                <p className="text-[#FFD700] font-semibold mb-2 text-sm sm:text-base">{member.role}</p>
+                <p className="text-gray-600 text-sm sm:text-base">{member.expertise}</p>
               </div>
             ))}
+          </div>
           </div>
         </section>
       </div>
     </div>
   );
 }
+

@@ -28,21 +28,22 @@ export default function VolunteerPage() {
   return (
     <div className="bg-white min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#008C5A] to-[#006B47] text-white py-20 text-center overflow-hidden">
-        <div className="absolute top-10 right-10 w-64 h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl animate-float"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-6xl font-bold mb-4 animate-fade-in-up">Become a Volunteer</h1>
-          <p className="text-xl opacity-95 max-w-3xl mx-auto animate-fade-in-up" style={{animationDelay: '100ms'}}>
+      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-[#008C5A] to-[#006B47] text-white overflow-hidden">
+        <div className="absolute top-10 right-10 w-64 h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl animate-float hidden md:block"></div>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center py-16 sm:py-20">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 animate-fade-in-up">Become a Volunteer</h1>
+          <p className="text-base sm:text-lg md:text-xl opacity-95 max-w-3xl mx-auto animate-fade-in-up px-4" style={{animationDelay: '100ms'}}>
             Join our network of heroes and make a real difference in your community
           </p>
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto py-16 px-4">
+      <div className="max-w-6xl mx-auto py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
         {/* Why Volunteer Section */}
-        <section className="mb-20">
-          <h2 className="text-4xl font-bold text-[#333333] mb-12 text-center">Why Volunteer?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <section className="min-h-screen flex items-center justify-center py-16 sm:py-20">
+          <div className="w-full">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#333333] mb-8 sm:mb-12 text-center">Why Volunteer?</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {[
               {
                 icon: '❤️',
@@ -82,11 +83,13 @@ export default function VolunteerPage() {
               </div>
             ))}
           </div>
+          </div>
         </section>
 
         {/* Available Roles Section */}
-        <section className="mb-20">
-          <h2 className="text-4xl font-bold text-[#333333] mb-12 text-center">Available Roles</h2>
+        <section className="min-h-screen flex items-center justify-center py-16 sm:py-20">
+          <div className="w-full">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#333333] mb-8 sm:mb-12 text-center">Available Roles</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
@@ -122,12 +125,13 @@ export default function VolunteerPage() {
               </div>
             ))}
           </div>
+          </div>
         </section>
 
         {/* Registration Form Section */}
-        <section className="mb-12">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-4xl font-bold text-[#333333] mb-6 text-center">Join Us Today</h2>
+        <section className="min-h-screen flex items-center justify-center py-16 sm:py-20">
+          <div className="max-w-3xl mx-auto w-full px-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#333333] mb-6 text-center">Join Us Today</h2>
             <p className="text-center text-gray-600 mb-12 text-lg">
               Fill out the form below to register as a volunteer. We'll contact you with next steps.
             </p>

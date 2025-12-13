@@ -33,27 +33,29 @@ export default function ContactPage() {
   return (
     <div className="bg-white min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#008C5A] to-[#006B47] text-white py-16 text-center overflow-hidden">
-        <div className="absolute top-10 right-10 w-48 h-48 bg-[#FFD700] opacity-10 rounded-full blur-3xl animate-float"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-5xl font-bold mb-4 animate-fade-in-up">Contact Us</h1>
-          <p className="text-lg opacity-95 max-w-2xl mx-auto animate-fade-in-up" style={{animationDelay: '100ms'}}>
+      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-[#008C5A] to-[#006B47] text-white overflow-hidden">
+        <div className="absolute top-10 right-10 w-48 h-48 bg-[#FFD700] opacity-10 rounded-full blur-3xl animate-float hidden md:block"></div>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center py-16">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 animate-fade-in-up">Contact Us</h1>
+          <p className="text-base sm:text-lg opacity-95 max-w-2xl mx-auto animate-fade-in-up px-4" style={{animationDelay: '100ms'}}>
             Have questions or suggestions? We'd love to hear from you
           </p>
         </div>
       </section>
 
-      <div className="max-w-5xl mx-auto py-16 px-4">
-        {/* Emergency Disclaimer */}
-        <div className="bg-red-50 border-l-4 border-red-500 p-6 mb-12 rounded-r-xl">
+      <div className="max-w-5xl mx-auto py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen flex items-center justify-center py-12 sm:py-16">
+          <div className="w-full">
+            {/* Emergency Disclaimer */}
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 sm:p-6 mb-8 sm:mb-12 rounded-r-xl">
           <div className="flex items-start">
             <div className="flex-shrink-0">
-              <svg className="h-6 w-6 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="h-5 w-5 sm:h-6 sm:w-6 text-red-500" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
             </div>
-            <div className="ml-4">
-              <p className="text-sm text-red-700">
+            <div className="ml-3 sm:ml-4">
+              <p className="text-xs sm:text-sm text-red-700">
                 <span className="font-bold">Urgent Emergency?</span> For immediate emergencies, please use the{' '}
                 <Link href="/requests/create" className="underline hover:text-red-900 font-semibold">
                   Report Help
@@ -64,10 +66,10 @@ export default function ContactPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
           {/* Contact Form */}
           <div>
-            <h2 className="text-3xl font-bold text-[#333333] mb-6">Send us a Message</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#333333] mb-6">Send us a Message</h2>
             
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
@@ -136,7 +138,7 @@ export default function ContactPage() {
 
           {/* Contact Information */}
           <div>
-            <h2 className="text-3xl font-bold text-[#333333] mb-6">Get in Touch</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#333333] mb-6">Get in Touch</h2>
             
             <div className="space-y-6">
               {/* Email */}
@@ -196,6 +198,8 @@ export default function ContactPage() {
               </div>
             </div>
           </div>
+        </div>
+        </div>
         </div>
       </div>
     </div>

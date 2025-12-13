@@ -83,9 +83,9 @@ export default function RequestHelpPage() {
   );
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white relative min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#DC3545] to-[#C82333] text-white py-16 text-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center  bg-gradient-to-br from-[#DC3545] to-[#C82333] text-white py-16 text-center overflow-hidden">
         <div className="absolute top-10 right-10 w-48 h-48 bg-white opacity-10 rounded-full blur-3xl animate-float"></div>
         <div className="container mx-auto px-4 relative z-10">
           <h1 className="text-5xl font-bold mb-4 animate-fade-in-up">Report Emergency</h1>

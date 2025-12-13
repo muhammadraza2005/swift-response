@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
+import AuthButton from "./components/AuthButton";
+import MobileNav from "./components/MobileNav";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,12 +30,14 @@ export default function RootLayout({
           <div className="container mx-auto px-4 py-4 flex justify-between items-center">
             <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               {/* Simple Logo Icon */}
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold">
+              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold text-sm">
                 SR
               </div>
-              <h1 className="text-xl font-bold tracking-tight text-primary">Swift Response</h1>
+              <h1 className="text-lg sm:text-xl font-bold tracking-tight text-primary">Swift Response</h1>
             </Link>
-            <nav>
+            
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:block">
               <ul className="flex space-x-6 font-medium text-sm">
                 <li><a href="/" className="hover:text-primary transition-colors">Home</a></li>
                 <li><a href="/about" className="hover:text-primary transition-colors">About Us</a></li>
@@ -44,10 +48,15 @@ export default function RootLayout({
                 <li><a href="/privacy" className="hover:text-primary transition-colors">Privacy</a></li>
               </ul>
             </nav>
-            <div className="hidden md:block">
-              <a href="/login" className="bg-green-500 text-white px-4 py-2 rounded-md font-bold hover:bg-green-600 transition-colors text-sm">
-                Log In
-              </a>
+            
+            <div className="flex items-center gap-4">
+              {/* Desktop Auth Button */}
+              <div className="hidden lg:block">
+                <AuthButton />
+              </div>
+              
+              {/* Mobile Menu Button */}
+              <MobileNav />
             </div>
           </div>
         </header>
