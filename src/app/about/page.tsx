@@ -142,7 +142,7 @@ export default function AboutPage() {
               },
               {
                 icon: '👥',
-                year: '2026',
+                year: '2027',
                 title: '100,000+ Users',
                 description: 'We will reach a milestone of over 100,000 users, reflecting our growing impact.',
                 color: 'from-orange-500 to-red-500'

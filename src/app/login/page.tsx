@@ -28,48 +28,60 @@ export default function LoginPage() {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push('/dashboard'); // Redirect to dashboard after login
+      router.push('/dashboard');
       router.refresh();
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-md border border-gray-100">
-        <h2 className="text-3xl font-bold text-center text-primary mb-8">Welcome Back</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#008C5A] via-[#00A366] to-[#006B47] px-4 relative overflow-hidden">
+      {/* Decorative Background Elements */}
+      <div className="absolute top-20 right-20 w-96 h-96 bg-[#FFD700] opacity-10 rounded-full blur-3xl animate-float"></div>
+      <div className="absolute bottom-20 left-20 w-80 h-80 bg-white opacity-5 rounded-full blur-3xl" style={{animation: 'float 6s ease-in-out infinite'}}></div>
+      <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-[#00A366] opacity-10 rounded-full blur-2xl" style={{animation: 'float 8s ease-in-out infinite'}}></div>
+      <div className="absolute bottom-1/3 right-1/3 w-72 h-72 bg-[#FFD700] opacity-5 rounded-full blur-3xl" style={{animation: 'float 7s ease-in-out infinite'}}></div>
+      
+      {/* Login Card */}
+      <div className="max-w-md w-full bg-white p-8 md:p-10 rounded-2xl shadow-2xl border border-gray-100 relative z-10 animate-fade-in-up">
+        <div className="text-center mb-8">
+          <h2 className="text-4xl font-bold text-[#008C5A] mb-2">Welcome Back</h2>
+          <p className="text-gray-600">Sign in to continue to Swift Response</p>
+        </div>
         
         {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4 text-sm">
+          <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm border border-red-200 animate-shake">
             {error}
           </div>
         )}
 
         <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <div className="group">
+            <label className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#008C5A] focus:border-[#008C5A] transition-all duration-300 hover:border-gray-300 bg-gray-50 focus:bg-white"
+              placeholder="you@example.com"
             />
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <div className="group">
+            <label className="block text-sm font-bold text-gray-700 mb-2">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary pr-10"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#008C5A] focus:border-[#008C5A] transition-all duration-300 hover:border-gray-300 pr-12 bg-gray-50 focus:bg-white"
+                placeholder="Enter your password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#008C5A] transition-colors duration-300 hover:scale-110 active:scale-95"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -79,18 +91,28 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-[#008C5A] to-[#00A366] text-white font-bold py-4 rounded-xl hover:from-[#006B47] hover:to-[#008C5A] transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
           >
-            {loading ? 'Logging in...' : 'Log In'}
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Logging in...
+              </span>
+            ) : 'Log In'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-gray-600 text-sm">
-          Don't have an account?{' '}
-          <Link href="/signup" className="text-primary font-semibold hover:underline">
-            Sign Up
-          </Link>
-        </p>
+        <div className="mt-8 text-center">
+          <p className="text-gray-600">
+            Don't have an account?{' '}
+            <Link href="/signup" className="text-[#008C5A] font-bold hover:text-[#006B47] hover:underline transition-colors">
+              Sign Up
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
