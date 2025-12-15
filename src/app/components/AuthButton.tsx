@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/utils/supabase';
 import Loader from '@/components/Loader';
+import Link from 'next/link';
+import { User } from 'lucide-react';
 
 export default function AuthButton() {
   const [user, setUser] = useState<any>(null);
@@ -44,12 +46,21 @@ export default function AuthButton() {
 
   if (user) {
     return (
-      <button
-        onClick={handleLogout}
-        className="bg-red-500 text-white px-4 py-2 rounded-md font-bold hover:bg-red-600 transition-colors text-sm"
-      >
-        Log Out
-      </button>
+      <div className="flex items-center gap-4">
+        <Link
+          href="/profile"
+          className="flex items-center gap-2 text-gray-700 hover:text-[#008C5A] font-medium transition-colors"
+        >
+          <User className="w-5 h-5" />
+          <span>Profile</span>
+        </Link>
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 text-white px-4 py-2 rounded-md font-bold hover:bg-red-600 transition-colors text-sm"
+        >
+          Log Out
+        </button>
+      </div>
     );
   }
 

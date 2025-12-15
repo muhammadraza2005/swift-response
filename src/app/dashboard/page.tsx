@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/utils/supabase';
 import { useRouter } from 'next/navigation';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import DashboardStats from '@/components/dashboard/DashboardStats';
 import DashboardRequestsSection from '@/components/dashboard/DashboardRequestsSection';
 import EmergencyMap from '@/components/maps/EmergencyMap';
 import Loader from '@/components/Loader';
@@ -80,11 +79,6 @@ export default function DashboardPage() {
       />
 
       <div className="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-        <DashboardStats
-          userName={user?.user_metadata?.full_name || 'User'}
-          userRole={user?.user_metadata?.role || 'User'}
-        />
-
         {/* Emergency Map */}
         {requests.length > 0 && (
           <div className="mb-8">
