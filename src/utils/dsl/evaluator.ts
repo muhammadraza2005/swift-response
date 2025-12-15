@@ -1,5 +1,10 @@
 /**
  * Evaluator - Visitor Pattern Implementation for AST Execution
+ * 
+ * Code Quality Improvements:
+ * - Modularity: Binary operations split into functional categories.
+ * - Clarity: Helper methods with descriptive names.
+ * - Correctness: Strict type checking helper.
  */
 
 import {
@@ -12,6 +17,7 @@ import {
   ConditionalNode,
   MemberAccessNode,
 } from './ast';
+import { assert } from '../debug/assert';
 
 type EvaluatorValue = string | number | boolean | Record<string, unknown> | null | undefined;
 type EvaluatorContext = Record<string, EvaluatorValue>;
@@ -38,71 +44,72 @@ export class Evaluator implements ASTVisitor<EvaluatorValue> {
     const left = node.left.accept(this);
     const right = node.right.accept(this);
 
-    switch (node.operator) {
-      case '+':
-        if (typeof left === 'number' && typeof right === 'number') {
-          return left + right;
-        }
-        if (typeof left === 'string' || typeof right === 'string') {
-          return String(left) + String(right);
-        }
-        throw new Error('Invalid operands for + operator');
-      
-      case '-':
-        if (typeof left === 'number' && typeof right === 'number') {
-          return left - right;
-        }
-        throw new Error('Invalid operands for - operator');
-      
-      case '*':
-        if (typeof left === 'number' && typeof right === 'number') {
-          return left * right;
-        }
-        throw new Error('Invalid operands for * operator');
-      
-      case '/':
-        if (typeof left === 'number' && typeof right === 'number') {
-          return left / right;
-        }
-        throw new Error('Invalid operands for / operator');
-      
-      case '%':
-        if (typeof left === 'number' && typeof right === 'number') {
-          return left % right;
-        }
-        throw new Error('Invalid operands for % operator');
-      
+    // Dispatch based on operator category
+    if (['+', '-', '*', '/', '%'].includes(node.operator)) {
+      return this.evaluateArithmetic(node.operator, left, right);
+    }
+    if (['<', '>', '<=', '>='].includes(node.operator)) {
+      return this.evaluateComparison(node.operator, left, right);
+    }
+    if (['==', '!='].includes(node.operator)) {
+      return this.evaluateEquality(node.operator, left, right);
+    }
+    if (['&&', '||'].includes(node.operator)) {
+      return this.evaluateLogic(node.operator, left, right);
+    }
+
+    throw new Error(`Unknown operator: ${node.operator}`);
+  }
+
+  private evaluateArithmetic(op: string, left: EvaluatorValue, right: EvaluatorValue): EvaluatorValue {
+    // Special case for string concatenation
+    if (op === '+') {
+      if (typeof left === 'string' || typeof right === 'string') {
+        return String(left) + String(right);
+      }
+    }
+
+    const nLeft = this.ensureNumber(left, op);
+    const nRight = this.ensureNumber(right, op);
+
+    switch (op) {
+      case '+': return nLeft + nRight;
+      case '-': return nLeft - nRight;
+      case '*': return nLeft * nRight;
+      case '/': 
+        if (nRight === 0) throw new Error('Division by zero');
+        return nLeft / nRight;
+      case '%': return nLeft % nRight;
+      default: throw new Error(`Invalid arithmetic operator: ${op}`);
+    }
+  }
+
+  private evaluateComparison(op: string, left: EvaluatorValue, right: EvaluatorValue): boolean {
+    const nLeft = this.ensureNumber(left, op);
+    const nRight = this.ensureNumber(right, op);
+
+    switch (op) {
+      case '<': return nLeft < nRight;
+      case '>': return nLeft > nRight;
+      case '<=': return nLeft <= nRight;
+      case '>=': return nLeft >= nRight;
+      default: throw new Error(`Invalid comparison operator: ${op}`);
+    }
+  }
+
+  private evaluateEquality(op: string, left: EvaluatorValue, right: EvaluatorValue): boolean {
+    switch (op) {
       case '==': return left === right;
       case '!=': return left !== right;
-      case '<':
-        if (typeof left === 'number' && typeof right === 'number') {
-          return left < right;
-        }
-        throw new Error('Invalid operands for < operator');
-      
-      case '>':
-        if (typeof left === 'number' && typeof right === 'number') {
-          return left > right;
-        }
-        throw new Error('Invalid operands for > operator');
-      
-      case '<=':
-        if (typeof left === 'number' && typeof right === 'number') {
-          return left <= right;
-        }
-        throw new Error('Invalid operands for <= operator');
-      
-      case '>=':
-        if (typeof left === 'number' && typeof right === 'number') {
-          return left >= right;
-        }
-        throw new Error('Invalid operands for >= operator');
-      
+      default: throw new Error(`Invalid equality operator: ${op}`);
+    }
+  }
+
+  private evaluateLogic(op: string, left: EvaluatorValue, right: EvaluatorValue): boolean {
+    switch (op) {
       case '&&': return Boolean(left) && Boolean(right);
       case '||': return Boolean(left) || Boolean(right);
-      
-      default:
-        throw new Error(`Unknown operator: ${node.operator}`);
+      default: throw new Error(`Invalid logic operator: ${op}`);
     }
   }
 
@@ -111,14 +118,9 @@ export class Evaluator implements ASTVisitor<EvaluatorValue> {
 
     switch (node.operator) {
       case '-':
-        if (typeof operand === 'number') {
-          return -operand;
-        }
-        throw new Error('Invalid operand for - operator');
-      
+        return -this.ensureNumber(operand, '-');
       case '!':
         return !operand;
-      
       default:
         throw new Error(`Unknown unary operator: ${node.operator}`);
     }
@@ -151,5 +153,15 @@ export class Evaluator implements ASTVisitor<EvaluatorValue> {
     
     const value = (object as Record<string, unknown>)[node.property];
     return value as EvaluatorValue;
+  }
+
+  private ensureNumber(val: EvaluatorValue, op: string): number {
+    if (typeof val !== 'number') {
+      throw new Error(`Invalid operand for ${op} operator: expected number, got ${typeof val}`);
+    }
+    if (isNaN(val)) {
+        throw new Error(`Invalid operand for ${op} operator: NaN`);
+    }
+    return val;
   }
 }
