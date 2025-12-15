@@ -4,14 +4,24 @@ interface LoaderProps {
     className?: string;
     size?: 'sm' | 'md' | 'lg';
     text?: string;
+    variant?: 'full' | 'inline';
 }
 
-export default function Loader({ className = '', size = 'md', text = 'Loading...' }: LoaderProps) {
+export default function Loader({ className = '', size = 'md', text = 'Loading...', variant = 'full' }: LoaderProps) {
     const sizeClasses = {
-        sm: 'w-6 h-6',
+        sm: 'w-5 h-5',
         md: 'w-10 h-10',
         lg: 'w-16 h-16'
     };
+
+    if (variant === 'inline') {
+        return (
+            <div className={`flex items-center gap-2 text-gray-500 ${className}`}>
+                <Loader2 className={`${sizeClasses[size]} animate-spin`} />
+                {text && <span className="text-sm font-medium">{text}</span>}
+            </div>
+        );
+    }
 
     return (
         <div className={`flex flex-col items-center justify-center min-h-[50vh] gap-4 ${className}`}>

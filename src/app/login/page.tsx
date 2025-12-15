@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { supabase } from '@/utils/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -37,17 +37,17 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#008C5A] via-[#00A366] to-[#006B47] px-4 relative overflow-hidden">
       {/* Decorative Background Elements */}
       <div className="absolute top-20 right-20 w-96 h-96 bg-[#FFD700] opacity-10 rounded-full blur-3xl animate-float"></div>
-      <div className="absolute bottom-20 left-20 w-80 h-80 bg-white opacity-5 rounded-full blur-3xl" style={{animation: 'float 6s ease-in-out infinite'}}></div>
-      <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-[#00A366] opacity-10 rounded-full blur-2xl" style={{animation: 'float 8s ease-in-out infinite'}}></div>
-      <div className="absolute bottom-1/3 right-1/3 w-72 h-72 bg-[#FFD700] opacity-5 rounded-full blur-3xl" style={{animation: 'float 7s ease-in-out infinite'}}></div>
-      
+      <div className="absolute bottom-20 left-20 w-80 h-80 bg-white opacity-5 rounded-full blur-3xl" style={{ animation: 'float 6s ease-in-out infinite' }}></div>
+      <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-[#00A366] opacity-10 rounded-full blur-2xl" style={{ animation: 'float 8s ease-in-out infinite' }}></div>
+      <div className="absolute bottom-1/3 right-1/3 w-72 h-72 bg-[#FFD700] opacity-5 rounded-full blur-3xl" style={{ animation: 'float 7s ease-in-out infinite' }}></div>
+
       {/* Login Card */}
       <div className="max-w-md w-full bg-white p-8 md:p-10 rounded-2xl shadow-2xl border border-gray-100 relative z-10 animate-fade-in-up">
         <div className="text-center mb-8">
           <h2 className="text-4xl font-bold text-[#008C5A] mb-2">Welcome Back</h2>
           <p className="text-gray-600">Sign in to continue to Swift Response</p>
         </div>
-        
+
         {error && (
           <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm border border-red-200 animate-shake">
             {error}
@@ -66,7 +66,7 @@ export default function LoginPage() {
               placeholder="you@example.com"
             />
           </div>
-          
+
           <div className="group">
             <label className="block text-sm font-bold text-gray-700 mb-2">Password</label>
             <div className="relative">
@@ -95,10 +95,7 @@ export default function LoginPage() {
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+                <Loader2 className="animate-spin h-5 w-5" />
                 Logging in...
               </span>
             ) : 'Log In'}

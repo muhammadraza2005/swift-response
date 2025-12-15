@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/utils/supabase';
+import Loader from '@/components/Loader';
 
 export default function AuthButton() {
   const [user, setUser] = useState<any>(null);
@@ -35,8 +36,8 @@ export default function AuthButton() {
 
   if (loading) {
     return (
-      <div className="bg-gray-200 text-gray-400 px-4 py-2 rounded-md font-bold text-sm cursor-not-allowed">
-        Loading...
+      <div className="px-4 py-2 bg-gray-50 rounded-md">
+        <Loader variant="inline" size="sm" text="Loading..." className="!text-gray-400" />
       </div>
     );
   }

@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase';
 import { useRouter } from 'next/navigation';
 import LocationPicker from '@/components/maps/LocationPicker';
+import { Info, Check, Stethoscope, Flame, Waves, LifeBuoy, Home, Siren, Package, TriangleAlert, MapPin, Camera, AlertTriangle, Loader2 } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 export default function RequestHelpPage() {
   const [formData, setFormData] = useState({
@@ -63,10 +65,10 @@ export default function RequestHelpPage() {
     setLoading(true);
     setError(null);
 
-    const location = { 
-      lat: formData.coordinates.lat, 
-      lng: formData.coordinates.lng, 
-      address: formData.location 
+    const location = {
+      lat: formData.coordinates.lat,
+      lng: formData.coordinates.lng,
+      address: formData.location
     };
 
     // Note: urgency is used for UI but not stored in DB currently as per schema
@@ -87,14 +89,7 @@ export default function RequestHelpPage() {
     }
   };
 
-  if (!user) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#008C5A] mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading...</p>
-      </div>
-    </div>
-  );
+  if (!user) return <Loader text="Loading..." />;
 
   return (
     <div className="bg-white relative min-h-screen">
@@ -103,7 +98,7 @@ export default function RequestHelpPage() {
         <div className="absolute top-10 right-10 w-48 h-48 bg-white opacity-10 rounded-full blur-3xl animate-float"></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h1 className="text-5xl font-bold mb-4 animate-fade-in-up">Report Emergency</h1>
-          <p className="text-lg opacity-95 max-w-2xl mx-auto animate-fade-in-up" style={{animationDelay: '100ms'}}>
+          <p className="text-lg opacity-95 max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '100ms' }}>
             Get immediate help by reporting your emergency
           </p>
         </div>
@@ -113,24 +108,24 @@ export default function RequestHelpPage() {
         {/* Instructions */}
         <div className="glass p-8 rounded-2xl mb-8">
           <h3 className="text-2xl font-bold text-[#333333] mb-4 flex items-center">
-            <span className="text-3xl mr-3">ℹ️</span>
+            <Info className="w-8 h-8 mr-3 text-blue-500" />
             How to Report Correctly
           </h3>
           <ul className="space-y-3 text-gray-700">
-            <li className="flex items-start">
-              <span className="text-[#008C5A] mr-3 text-xl">✓</span>
+            <li className="flex items-center">
+              <Check className="w-5 h-5 text-[#008C5A] mr-3" />
               <span>Select the correct category for your emergency</span>
             </li>
-            <li className="flex items-start">
-              <span className="text-[#008C5A] mr-3 text-xl">✓</span>
+            <li className="flex items-center">
+              <Check className="w-5 h-5 text-[#008C5A] mr-3" />
               <span>Provide a precise location or description of surroundings</span>
             </li>
-            <li className="flex items-start">
-              <span className="text-[#008C5A] mr-3 text-xl">✓</span>
+            <li className="flex items-center">
+              <Check className="w-5 h-5 text-[#008C5A] mr-3" />
               <span>Keep the description clear and concise</span>
             </li>
-            <li className="flex items-start">
-              <span className="text-[#008C5A] mr-3 text-xl">✓</span>
+            <li className="flex items-center">
+              <Check className="w-5 h-5 text-[#008C5A] mr-3" />
               <span>Upload photos if safe to do so (Optional)</span>
             </li>
           </ul>
@@ -157,15 +152,15 @@ export default function RequestHelpPage() {
               required
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DC3545] focus:border-transparent transition-all"
             >
-              <option value="Medical">🏥 Medical Help</option>
-              <option value="Fire">🔥 Fire</option>
-              <option value="Flood">🌊 Flood</option>
+              <option value="Medical">Medical Help</option>
+              <option value="Fire">Fire</option>
+              <option value="Flood">Flood</option>
               {/* Mapped extra types to 'Other' or nearest equivalent or just use 'Other' for now to match schema */}
-              <option value="Rescue">🆘 Rescue</option>
-              <option value="Other">🏚️ Earthquake (Other)</option>
-              <option value="Other">🚨 Accident (Other)</option>
-              <option value="Other">📦 Supplies Needed (Other)</option>
-              <option value="Other">⚠️ Other</option>
+              <option value="Rescue">Rescue</option>
+              <option value="Other">Earthquake (Other)</option>
+              <option value="Other">Accident (Other)</option>
+              <option value="Other">Supplies Needed (Other)</option>
+              <option value="Other">Other</option>
             </select>
           </div>
 
@@ -180,15 +175,14 @@ export default function RequestHelpPage() {
                   key={level}
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, urgency: level }))}
-                  className={`py-3 px-4 rounded-lg font-semibold transition-all ${
-                    formData.urgency === level
-                      ? level === 'High'
-                        ? 'bg-red-500 text-white'
-                        : level === 'Medium'
+                  className={`py-3 px-4 rounded-lg font-semibold transition-all ${formData.urgency === level
+                    ? level === 'High'
+                      ? 'bg-red-500 text-white'
+                      : level === 'Medium'
                         ? 'bg-yellow-500 text-white'
                         : 'bg-green-500 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
                 >
                   {level}
                 </button>
@@ -218,7 +212,7 @@ export default function RequestHelpPage() {
             <label className="block text-sm font-bold text-gray-700 mb-3">
               Location *
             </label>
-            <LocationPicker 
+            <LocationPicker
               onLocationSelect={handleLocationSelect}
               initialLocation={formData.coordinates}
             />
@@ -232,8 +226,8 @@ export default function RequestHelpPage() {
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DC3545] focus:border-transparent transition-all mt-3"
               placeholder="Address will appear here when you select on map..."
             />
-            <p className="text-sm text-gray-500 mt-2">
-              📍 Click on the map above to select the emergency location, or use the current location button
+            <p className="text-sm text-gray-500 mt-2 flex items-center gap-1">
+              <MapPin className="w-4 h-4" /> Click on the map above to select the emergency location, or use the current location button
             </p>
           </div>
 
@@ -251,8 +245,8 @@ export default function RequestHelpPage() {
               accept="image/*"
               className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DC3545] focus:border-transparent transition-all"
             />
-            <p className="text-sm text-gray-500 mt-2">
-              📷 Upload photos if it's safe to do so (Max 5 images)
+            <p className="text-sm text-gray-500 mt-2 flex items-center gap-1">
+              <Camera className="w-4 h-4" /> Upload photos if it's safe to do so (Max 5 images)
             </p>
           </div>
 
@@ -264,14 +258,13 @@ export default function RequestHelpPage() {
           >
             {loading ? (
               <span className="flex items-center justify-center">
-                <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+                <Loader2 className="animate-spin h-5 w-5 mr-3" />
                 Submitting...
               </span>
             ) : (
-              '🚨 Submit Emergency Report'
+              <span className="flex items-center justify-center gap-2">
+                <AlertTriangle className="w-6 h-6" /> Submit Emergency Report
+              </span>
             )}
           </button>
         </form>
