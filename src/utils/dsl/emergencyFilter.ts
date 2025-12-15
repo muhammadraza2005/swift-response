@@ -6,6 +6,7 @@
 import { IEmergencyRequest, ILocation } from '@/types/models';
 import { Parser } from './parser';
 import { Evaluator } from './evaluator';
+import { ConstantFoldingOptimizer } from './optimizer';
 import { ASTNode } from './ast';
 
 type EvaluatorValue = string | number | boolean | Record<string, unknown> | null | undefined;
@@ -96,9 +97,11 @@ export interface FilterContext {
 
 export class EmergencyFilterDSL {
   private parser: Parser;
+  private optimizer: ConstantFoldingOptimizer;
 
   constructor() {
     this.parser = new Parser();
+    this.optimizer = new ConstantFoldingOptimizer();
   }
 
   /**
@@ -106,6 +109,15 @@ export class EmergencyFilterDSL {
    */
   parse(expression: string): ASTNode {
     return this.parser.parse(expression);
+  }
+
+  /**
+   * Parse and Optimize a filter expression
+   * Demonstrates the pipeline: Source -> Parse -> Optimize (Recursive) -> AST
+   */
+  parseAndOptimize(expression: string): ASTNode {
+    const ast = this.parser.parse(expression);
+    return this.optimizer.optimize(ast);
   }
 
   /**
@@ -118,7 +130,9 @@ export class EmergencyFilterDSL {
     }
     
     try {
-      const ast = this.parse(expression);
+      // Use the optimized AST
+      // (Optimization happens recursively)
+      const ast = this.parseAndOptimize(expression);
       
       // Build evaluation context
       const location = request.location as ILocation;
