@@ -1,199 +1,233 @@
 'use client';
 
 import { useState } from 'react';
+import {
+  Shield,
+  Users,
+  Zap,
+  Rocket,
+  MapPin,
+  Send
+} from 'lucide-react';
 
 export default function AboutPage() {
-  const [formData, setFormData] = useState({ email: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Message sent! We will get back to you soon.');
-    setFormData({ email: '', message: '' });
+    setStatus('submitting');
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setStatus('success');
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        setStatus('error');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setStatus('error');
+    }
   };
 
   return (
     <div className="bg-gradient-to-b from-white via-gray-50 to-white">
       {/* Enhanced Header with Gradient Background */}
-      <div className="relative bg-gradient-to-br from-[#008C5A] via-[#00A366] to-[#006B47] py-20 px-4 overflow-hidden">
-        {/* Decorative Elements */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#FFD700] opacity-10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-white opacity-5 rounded-full blur-3xl"></div>
-        
-        <div className="max-w-4xl mx-auto relative z-10">
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 animate-fade-in-up">About Swift Response</h1>
-          <div className="w-24 h-1 bg-[#FFD700] rounded-full"></div>
+      <div className="relative bg-[#008C5A] py-24 px-4 overflow-hidden">
+        {/* Decorative Elements - Subtle Patterns instead of blobs */}
+        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
+
+        <div className="max-w-4xl mx-auto relative z-10 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in-up tracking-tight">About Swift Response</h1>
+          <div className="w-20 h-1 bg-white/30 mx-auto rounded-full"></div>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-20">
-        {/* Mission Section with Enhanced Card */}
+        {/* Mission Section */}
         <section className="mb-20">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-            <span className="w-2 h-10 bg-gradient-to-b from-[#008C5A] to-[#00A366] rounded-full"></span>
+            <span className="w-1.5 h-8 bg-[#008C5A] rounded-full"></span>
             Our Mission
           </h2>
-          <div className="bg-white rounded-2xl p-8 md:p-10 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#008C5A] to-[#00A366] opacity-5 rounded-full blur-3xl group-hover:opacity-10 transition-opacity"></div>
-            <p className="text-gray-700 leading-relaxed text-lg relative z-10">
-              Swift Response is dedicated to enhancing community safety and resilience through rapid, coordinated emergency 
-              response. Our platform empowers individuals to report incidents swiftly, access vital resources, and collaborate effectively 
+          <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+            <p className="text-gray-600 leading-relaxed text-lg sm:text-xl">
+              Swift Response is dedicated to enhancing community safety and resilience through rapid, coordinated emergency
+              response. Our platform empowers individuals to report incidents swiftly, access vital resources, and collaborate effectively
               during crises. We strive to build a network where every member can contribute to a safer environment for all.
             </p>
           </div>
         </section>
 
-        {/* Values Section with Enhanced Cards */}
+        {/* Values Section */}
         <section className="mb-20">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-10 flex items-center gap-3">
-            <span className="w-2 h-10 bg-gradient-to-b from-[#008C5A] to-[#00A366] rounded-full"></span>
+            <span className="w-1.5 h-8 bg-[#008C5A] rounded-full"></span>
             Our Values
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
-                icon: '🛡️',
+                icon: Shield,
                 title: 'Safety First',
                 description: 'Prioritizing the safety and well-being of individuals and communities.',
-                gradient: 'from-blue-500 to-cyan-500'
+                color: 'text-blue-600',
+                bg: 'bg-blue-50'
               },
               {
-                icon: '👥',
-                title: 'Community Collaboration',
+                icon: Users,
+                title: 'Community',
                 description: 'Fostering a collaborative spirit where every member can contribute.',
-                gradient: 'from-purple-500 to-pink-500'
+                color: 'text-purple-600',
+                bg: 'bg-purple-50'
               },
               {
-                icon: '⚡',
+                icon: Zap,
                 title: 'Rapid Action',
                 description: 'Ensuring swift and effective responses to emergencies.',
-                gradient: 'from-orange-500 to-red-500'
+                color: 'text-orange-600',
+                bg: 'bg-orange-50'
               }
             ].map((value, index) => (
-              <div 
-                key={value.title} 
-                className="group bg-white border-2 border-gray-100 rounded-2xl p-8 hover:border-[#008C5A] hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden"
+              <div
+                key={value.title}
+                className="group bg-white border border-gray-100 rounded-2xl p-8 hover:border-[#008C5A] hover:shadow-lg transition-all duration-300"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${value.gradient} opacity-0 group-hover:opacity-10 rounded-full blur-2xl transition-opacity duration-300`}></div>
-                <div className="relative z-10">
-                  <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">{value.icon}</div>
-                  <h3 className="font-bold text-xl text-gray-900 mb-3 group-hover:text-[#008C5A] transition-colors">{value.title}</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">{value.description}</p>
+                <div className={`w-14 h-14 ${value.bg} ${value.color} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                  <value.icon className="w-7 h-7" />
                 </div>
+                <h3 className="font-bold text-xl text-gray-900 mb-3 group-hover:text-[#008C5A] transition-colors">{value.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{value.description}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Team Section with Enhanced Avatars */}
+        {/* Team Section */}
         <section className="mb-20">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-10 flex items-center gap-3">
-            <span className="w-2 h-10 bg-gradient-to-b from-[#008C5A] to-[#00A366] rounded-full"></span>
+            <span className="w-1.5 h-8 bg-[#008C5A] rounded-full"></span>
             Our Team
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { name: 'Nosherwan Tahir', role: 'Team Lead', initials: 'NT', color: 'from-[#008C5A] to-[#00A366]' },
-              { name: 'Muhammad Raza Khan', role: 'Full Stack Developer', initials: 'MR', color: 'from-[#FFD700] to-[#F4B942]' },
-              { name: 'Muhammad Sohaib Akhtar', role: 'UI/UX Designer and Developer', initials: 'MS', color: 'from-[#008C5A] to-[#00A366]' }
+              { name: 'Nosherwan Tahir', role: 'Team Lead', initials: 'NT' },
+              { name: 'Muhammad Raza Khan', role: 'Full Stack Developer', initials: 'MR' },
+              { name: 'Muhammad Sohaib Akhtar', role: 'UI/UX Designer', initials: 'MS' }
             ].map((member, index) => (
-              <div 
-                key={member.name} 
-                className="text-center group"
+              <div
+                key={member.name}
+                className="bg-white p-6 rounded-2xl border border-gray-100 text-center hover:shadow-lg transition-all duration-300 group"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="relative inline-block mb-6">
-                  <div className={`w-36 h-36 mx-auto rounded-full bg-gradient-to-br ${member.color} flex items-center justify-center shadow-xl group-hover:shadow-2xl group-hover:scale-110 transition-all duration-300`}>
-                    <span className="text-white text-4xl font-bold">{member.initials}</span>
-                  </div>
-                  <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${member.color} opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300`}></div>
+                <div className="w-24 h-24 mx-auto rounded-full bg-gray-100 flex items-center justify-center mb-4 group-hover:bg-[#008C5A] transition-colors duration-300">
+                  <span className="text-2xl font-bold text-gray-600 group-hover:text-white transition-colors">{member.initials}</span>
                 </div>
-                <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-[#008C5A] transition-colors">{member.name}</h3>
-                <p className="text-gray-600 text-sm font-medium">{member.role}</p>
+                <h3 className="font-bold text-lg text-gray-900 mb-1">{member.name}</h3>
+                <p className="text-[#008C5A] text-sm font-medium">{member.role}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* History Section with Enhanced Timeline */}
+        {/* History Section */}
         <section className="mb-20">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-10 flex items-center gap-3">
-            <span className="w-2 h-10 bg-gradient-to-b from-[#008C5A] to-[#00A366] rounded-full"></span>
+            <span className="w-1.5 h-8 bg-[#008C5A] rounded-full"></span>
             Our Journey
           </h2>
-          <div className="space-y-8 relative">
-            {/* Timeline Line */}
-            <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#008C5A] to-[#00A366] hidden md:block"></div>
-            
+          <div className="space-y-8 relative pl-8 border-l-2 border-gray-100 ml-4">
             {[
               {
-                icon: '🚀',
+                icon: Rocket,
                 year: '2025',
                 title: 'Platform Idea',
-                description: 'Swift Response was envisioned to transform community emergency response.',
-                color: 'from-blue-500 to-cyan-500'
+                description: 'Swift Response was envisioned to transform community emergency response.'
               },
               {
-                icon: '📍',
+                icon: MapPin,
                 year: '2026',
                 title: 'Platform Launch',
-                description: 'Swift Response will be launched with a vision to transform community emergency response.',
-                color: 'from-purple-500 to-pink-500'
+                description: 'Swift Response will be launched with a vision to transform community emergency response.'
               },
               {
-                icon: '👥',
+                icon: Users,
                 year: '2027',
                 title: '100,000+ Users',
-                description: 'We will reach a milestone of over 100,000 users, reflecting our growing impact.',
-                color: 'from-orange-500 to-red-500'
+                description: 'We will reach a milestone of over 100,000 users, reflecting our growing impact.'
               }
             ].map((milestone, index) => (
-              <div 
-                key={milestone.year} 
-                className="flex gap-6 group"
+              <div
+                key={milestone.year}
+                className="relative group"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="flex-shrink-0 relative">
-                  <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${milestone.color} flex items-center justify-center text-2xl shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 relative z-10`}>
-                    {milestone.icon}
-                  </div>
-                  <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${milestone.color} opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-300`}></div>
-                </div>
-                <div className="flex-1 bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100">
-                  <div className="flex items-baseline gap-2 mb-2">
+                <div className="absolute -left-[45px] top-0 w-8 h-8 rounded-full bg-white border-4 border-[#008C5A] z-10"></div>
+
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
+                  <div className="flex items-center gap-3 mb-2">
                     <span className="text-[#008C5A] font-bold text-lg">{milestone.year}</span>
-                    <span className="font-bold text-gray-900 text-lg">{milestone.title}</span>
+                    <span className="w-1 h-4 bg-gray-200"></span>
+                    <h3 className="font-bold text-gray-900 text-lg">{milestone.title}</h3>
                   </div>
-                  <p className="text-gray-600 leading-relaxed">{milestone.description}</p>
+                  <p className="text-gray-600 leading-relaxed text-sm">{milestone.description}</p>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Contact Section with Enhanced Form */}
-        <section className="bg-gradient-to-br from-gray-50 to-white rounded-3xl p-8 md:p-12 shadow-xl border border-gray-100">
+        {/* Contact Section */}
+        <section className="bg-white rounded-3xl p-8 md:p-12 shadow-lg border border-gray-100">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-            <span className="w-2 h-10 bg-gradient-to-b from-[#008C5A] to-[#00A366] rounded-full"></span>
+            <span className="w-1.5 h-8 bg-[#008C5A] rounded-full"></span>
             Contact Us
           </h2>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-bold text-gray-900 mb-3">
-                Your Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                required
-                placeholder="Enter your email"
-                className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#008C5A] focus:border-[#008C5A] transition-all bg-white shadow-sm hover:shadow-md"
-              />
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  required
+                  placeholder="Enter your name"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#008C5A] focus:border-transparent transition-all bg-gray-50 focus:bg-white"
+                />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Your Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  required
+                  placeholder="Enter your email"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#008C5A] focus:border-transparent transition-all bg-gray-50 focus:bg-white"
+                />
+              </div>
             </div>
             <div>
-              <label htmlFor="message" className="block text-sm font-bold text-gray-900 mb-3">
+              <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
                 Your Message
               </label>
               <textarea
@@ -203,18 +237,35 @@ export default function AboutPage() {
                 required
                 rows={6}
                 placeholder="Enter your message"
-                className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#008C5A] focus:border-[#008C5A] transition-all resize-none bg-white shadow-sm hover:shadow-md"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#008C5A] focus:border-transparent transition-all resize-none bg-gray-50 focus:bg-white"
               />
             </div>
             <button
               type="submit"
-              className="bg-gradient-to-r from-[#008C5A] to-[#00A366] hover:from-[#006B47] hover:to-[#008C5A] text-white font-bold py-4 px-10 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 active:scale-95"
+              disabled={status === 'submitting'}
+              className="flex items-center justify-center gap-2 w-full sm:w-auto bg-[#008C5A] hover:bg-[#007a4e] text-white font-bold py-4 px-10 rounded-xl transition-all duration-300 shadow-md hover:shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Send Message
+              {status === 'submitting' ? 'Sending...' : 'Send Message'}
+              {!status && <Send className="w-4 h-4" />}
             </button>
+
+            {status === 'success' && (
+              <div className="bg-emerald-50 text-emerald-700 p-4 rounded-xl border border-emerald-100 flex items-center gap-2">
+                <Shield className="w-5 h-5" />
+                <p className="font-medium">Message sent successfully! We'll get back to you soon.</p>
+              </div>
+            )}
+
+            {status === 'error' && (
+              <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 flex items-center gap-2">
+                <Shield className="w-5 h-5" />
+                <p className="font-medium">Failed to send message. Please try again.</p>
+              </div>
+            )}
           </form>
         </section>
       </div>
     </div>
   );
 }
+

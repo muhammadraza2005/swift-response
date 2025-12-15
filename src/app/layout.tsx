@@ -4,6 +4,7 @@ import Link from "next/link";
 import "./globals.css";
 import AuthButton from "./components/AuthButton";
 import MobileNav from "./components/MobileNav";
+import Logo from "@/components/Logo";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,48 +29,95 @@ export default function RootLayout({
         {/* Header */}
         <header className="bg-white text-gray-900 shadow-sm sticky top-0 z-50 border-b border-gray-200">
           <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              {/* Simple Logo Icon */}
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold text-sm">
-                SR
-              </div>
-              <h1 className="text-lg sm:text-xl font-bold tracking-tight text-primary">Swift Response</h1>
+            <Link
+              href="/"
+              className="hover:opacity-80 transition-opacity"
+            >
+              <Logo />
             </Link>
-            
+
             {/* Desktop Navigation */}
             <nav className="hidden lg:block">
               <ul className="flex space-x-6 font-medium text-sm">
-                <li><a href="/" className="hover:text-primary transition-colors">Home</a></li>
-                <li><a href="/about" className="hover:text-primary transition-colors">About Us</a></li>
-                <li><a href="/contact" className="hover:text-primary transition-colors">Contact Us</a></li>
-                <li><a href="/dashboard" className="hover:text-primary transition-colors">DashBoard</a></li>
-                <li><a href="/volunteer" className="hover:text-primary transition-colors">Volunteer</a></li>
-                <li><a href="/terms" className="hover:text-primary transition-colors">Terms</a></li>
-                <li><a href="/privacy" className="hover:text-primary transition-colors">Privacy</a></li>
+                <li>
+                  <Link
+                    href="/"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/about"
+                    className="hover:text-primary transition-colors"
+                  >
+                    About Us
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/contact"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Contact Us
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/dashboard"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/volunteer"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Volunteer
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/terms"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Terms
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/privacy"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Privacy
+                  </Link>
+                </li>
               </ul>
             </nav>
-            
+
             <div className="flex items-center gap-4">
               {/* Desktop Auth Button */}
               <div className="hidden lg:block">
                 <AuthButton />
               </div>
-              
+
               {/* Mobile Menu Button */}
               <MobileNav />
             </div>
           </div>
         </header>
 
-        <main className="min-h-screen">
-          {children}
-        </main>
+        <main className="min-h-screen">{children}</main>
 
         <footer className="bg-[#333333] text-white py-8">
-          <div className="container mx-auto px-4 text-center">
-            <p className="font-semibold text-lg mb-2">Swift Response</p>
+          <div className="container mx-auto px-4 text-center flex flex-col items-center">
+            <Logo variant="light" className="mb-4" />
             <p className="text-[#F8F9FA] opacity-80 text-sm">
-              &copy; {new Date().getFullYear()} Community Emergency Response Platform.
+              &copy; {new Date().getFullYear()} Community Emergency Response
+              Platform.
             </p>
           </div>
         </footer>

@@ -77,8 +77,22 @@ export default function LocationPicker({ onLocationSelect, initialLocation }: Lo
           });
         },
         (error) => {
-          console.error('Error getting location:', error);
-          alert('Unable to get your current location. Please click on the map to select a location.');
+          let message = 'Unable to get your current location.';
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              message = 'Location access denied. Please enable location permissions and try again.';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              message = 'Location information is unavailable. Please check your device settings.';
+              break;
+            case error.TIMEOUT:
+              message = 'Location request timed out. Please try again.';
+              break;
+            default:
+              message = 'An unknown error occurred while retrieving location.';
+              break;
+          }
+          alert(message + ' You can click on the map to select a location manually.');
         }
       );
     } else {

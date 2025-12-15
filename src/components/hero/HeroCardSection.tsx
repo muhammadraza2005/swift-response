@@ -1,8 +1,9 @@
 import HeroCard from './HeroCard';
+import { LucideIcon } from 'lucide-react';
 
 interface Card {
   title: string;
-  icon: string;
+  icon: string | LucideIcon;
 }
 
 interface HeroCardSectionProps {
@@ -16,8 +17,8 @@ export default function HeroCardSection({ cards, pageTitle, subtitle }: HeroCard
     <section className="relative py-16 sm:py-20 md:py-24 bg-gradient-to-br from-[#008C5A] to-[#006B47] text-white overflow-hidden">
       {/* Decorative floating elements */}
       <div className="absolute top-10 right-10 w-48 h-48 bg-[#FFD700] opacity-10 rounded-full blur-3xl animate-float hidden md:block"></div>
-      <div className="absolute bottom-10 left-10 w-64 h-64 bg-[#00A366] opacity-10 rounded-full blur-3xl hidden md:block" style={{animation: 'float 5s ease-in-out infinite'}}></div>
-      
+      <div className="absolute bottom-10 left-10 w-64 h-64 bg-[#00A366] opacity-10 rounded-full blur-3xl hidden md:block" style={{ animation: 'float 5s ease-in-out infinite' }}></div>
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Page Title */}
         <div className="text-center mb-12">
@@ -25,7 +26,7 @@ export default function HeroCardSection({ cards, pageTitle, subtitle }: HeroCard
             {pageTitle}
           </h1>
           {subtitle && (
-            <p className="text-base sm:text-lg opacity-95 max-w-2xl mx-auto animate-fade-in-up px-4" style={{animationDelay: '100ms'}}>
+            <p className="text-base sm:text-lg opacity-95 max-w-2xl mx-auto animate-fade-in-up px-4" style={{ animationDelay: '100ms' }}>
               {subtitle}
             </p>
           )}
