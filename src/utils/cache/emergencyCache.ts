@@ -1,21 +1,45 @@
 /**
  * Emergency Request Cache - Demonstrates shared-memory safe concurrency
- * Uses concurrent data structures to prevent race conditions
+ * 
+ * ADT Implementation:
+ * - Implements IEmergencyRequestCache interface
+ * - Enforces Representation Invariants
+ * - Hides internal state (cache, lock, counters)
  */
 
 import { ConcurrentMap, ReadWriteLock, AtomicCounter } from '../concurrency/sharedMemory';
 import { globalRaceDetector } from '../concurrency/raceDetection';
 import { IEmergencyRequest } from '@/types/models';
+import { IEmergencyRequestCache } from './interfaces';
 
 /**
  * Thread-safe cache for emergency requests
+ * 
+ * Abstraction Function:
+ * AF(cache, counters) = A cache store of EmergencyRequests with usage statistics.
+ * 
+ * Representation Invariant:
+ * RI: cache != null && lock != null && counters != null
  */
-export class EmergencyRequestCache {
+export class EmergencyRequestCache implements IEmergencyRequestCache {
   private cache = new ConcurrentMap<string, IEmergencyRequest>();
   private lock = new ReadWriteLock();
   private hitCounter = new AtomicCounter();
   private missCounter = new AtomicCounter();
   private updateCounter = new AtomicCounter();
+
+  constructor() {
+    this.checkRep();
+  }
+
+  /**
+   * Enforces Representation Invariant
+   */
+  private checkRep(): void {
+    if (!this.cache || !this.lock || !this.hitCounter || !this.missCounter || !this.updateCounter) {
+      throw new Error('Invariant violation: internal components cannot be null');
+    }
+  }
 
   /**
    * Get request from cache
@@ -31,6 +55,7 @@ export class EmergencyRequestCache {
       await this.missCounter.increment();
     }
     
+    this.checkRep();
     return request;
   }
 
@@ -42,6 +67,7 @@ export class EmergencyRequestCache {
     
     await this.cache.set(id, request);
     await this.updateCounter.increment();
+    this.checkRep();
   }
 
   /**
@@ -79,6 +105,7 @@ export class EmergencyRequestCache {
       await this.cache.set(id, updated);
       await this.updateCounter.increment();
       
+      this.checkRep();
       return true;
     });
   }
@@ -88,7 +115,9 @@ export class EmergencyRequestCache {
    */
   async delete(id: string): Promise<boolean> {
     globalRaceDetector.recordAccess(`cache:${id}`, 'write');
-    return await this.cache.delete(id);
+    const result = await this.cache.delete(id);
+    this.checkRep();
+    return result;
   }
 
   /**
@@ -97,6 +126,7 @@ export class EmergencyRequestCache {
   async clear(): Promise<void> {
     globalRaceDetector.recordAccess('cache:all', 'write');
     await this.cache.clear();
+    this.checkRep();
   }
 
   /**

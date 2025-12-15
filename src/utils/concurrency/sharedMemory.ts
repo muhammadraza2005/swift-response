@@ -1,86 +1,124 @@
 /**
  * Concurrency Module - Shared-Memory Safe Operations
  * Implements thread-safe patterns for concurrent data access
+ * 
+ * Demonstrates ADT principles:
+ * - Separation of Interface and Implementation
+ * - Representation Invariants (RI)
+ * - Abstraction Functions (AF)
+ * - Invariant Enforcement (checkRep)
  */
+
+import { 
+  IReadWriteLock, 
+  IMutex, 
+  ISemaphore, 
+  IAtomicCounter, 
+  IConcurrentMap 
+} from './interfaces';
+
+// Re-export interfaces for consumers
+export type { IReadWriteLock, IMutex, ISemaphore, IAtomicCounter, IConcurrentMap };
 
 /**
  * ReadWriteLock - Allows multiple readers or single writer
- * Ensures safe concurrent access to shared resources
+ * 
+ * Abstraction Function:
+ * AF(readers, writer) = A lock state that is 'write-locked' if writer is true,
+ *                       'read-locked' by N readers if readers = N > 0,
+ *                       or 'unlocked' otherwise.
+ * 
+ * Representation Invariant:
+ * RI: readers >= 0
+ *     && (!writer || readers === 0) // If writer is true, readers must be 0
  */
-export class ReadWriteLock {
+export class ReadWriteLock implements IReadWriteLock {
   private readers = 0;
   private writer = false;
   private writeQueue: Array<() => void> = [];
   private readQueue: Array<() => void> = [];
 
+  constructor() {
+    this.checkRep();
+  }
+
   /**
-   * Acquire read lock (multiple readers allowed)
+   * Enforces the Representation Invariant
+   * Throws error if invariant is violated
    */
+  private checkRep(): void {
+    if (this.readers < 0) {
+      throw new Error('Invariant violation: readers count cannot be negative');
+    }
+    if (this.writer && this.readers > 0) {
+      throw new Error('Invariant violation: cannot have both writer and readers');
+    }
+  }
+
   async acquireRead(): Promise<void> {
     return new Promise((resolve) => {
       if (!this.writer && this.writeQueue.length === 0) {
         this.readers++;
+        this.checkRep();
         resolve();
       } else {
         this.readQueue.push(() => {
           this.readers++;
+          this.checkRep();
           resolve();
         });
       }
     });
   }
 
-  /**
-   * Release read lock
-   */
   releaseRead(): void {
     this.readers--;
+    this.checkRep();
+    
     if (this.readers === 0 && this.writeQueue.length > 0) {
       this.writer = true;
       const writer = this.writeQueue.shift();
       writer?.();
+      this.checkRep();
     }
   }
 
-  /**
-   * Acquire write lock (exclusive access)
-   */
   async acquireWrite(): Promise<void> {
     return new Promise((resolve) => {
       if (!this.writer && this.readers === 0) {
         this.writer = true;
+        this.checkRep();
         resolve();
       } else {
         this.writeQueue.push(() => {
           this.writer = true;
+          this.checkRep();
           resolve();
         });
       }
     });
   }
 
-  /**
-   * Release write lock
-   */
   releaseWrite(): void {
     this.writer = false;
+    this.checkRep();
     
     // Process waiting writers first (writer preference)
     if (this.writeQueue.length > 0) {
       const writer = this.writeQueue.shift();
+      this.writer = true; // Set directly before callback to maintain RI if callback checks
       writer?.();
+      this.checkRep();
     } else {
       // Allow all waiting readers
       while (this.readQueue.length > 0) {
         const reader = this.readQueue.shift();
         reader?.();
       }
+      this.checkRep();
     }
   }
 
-  /**
-   * Execute function with read lock
-   */
   async withReadLock<T>(fn: () => Promise<T> | T): Promise<T> {
     await this.acquireRead();
     try {
@@ -90,9 +128,6 @@ export class ReadWriteLock {
     }
   }
 
-  /**
-   * Execute function with write lock
-   */
   async withWriteLock<T>(fn: () => Promise<T> | T): Promise<T> {
     await this.acquireWrite();
     try {
@@ -105,43 +140,54 @@ export class ReadWriteLock {
 
 /**
  * Mutex - Mutual exclusion lock for critical sections
+ * 
+ * Abstraction Function:
+ * AF(locked) = A binary semaphore state (locked/unlocked)
+ * 
+ * Representation Invariant:
+ * RI: locked is boolean
  */
-export class Mutex {
+export class Mutex implements IMutex {
   private locked = false;
   private queue: Array<() => void> = [];
 
-  /**
-   * Acquire mutex lock
-   */
+  constructor() {
+    this.checkRep();
+  }
+
+  private checkRep(): void {
+    if (typeof this.locked !== 'boolean') {
+      throw new Error('Invariant violation: locked state must be boolean');
+    }
+  }
+
   async acquire(): Promise<void> {
     return new Promise((resolve) => {
       if (!this.locked) {
         this.locked = true;
+        this.checkRep();
         resolve();
       } else {
         this.queue.push(() => {
           this.locked = true;
+          this.checkRep();
           resolve();
         });
       }
     });
   }
 
-  /**
-   * Release mutex lock
-   */
   release(): void {
     if (this.queue.length > 0) {
       const next = this.queue.shift();
       next?.();
+      // locked remains true as ownership passes
     } else {
       this.locked = false;
     }
+    this.checkRep();
   }
 
-  /**
-   * Execute function with mutex lock
-   */
   async withLock<T>(fn: () => Promise<T> | T): Promise<T> {
     await this.acquire();
     try {
@@ -151,9 +197,6 @@ export class Mutex {
     }
   }
 
-  /**
-   * Check if mutex is currently locked
-   */
   isLocked(): boolean {
     return this.locked;
   }
@@ -161,18 +204,28 @@ export class Mutex {
 
 /**
  * Semaphore - Counting semaphore for resource pool management
+ * 
+ * Abstraction Function:
+ * AF(permits) = A pool of 'permits' available resources
+ * 
+ * Representation Invariant:
+ * RI: queue is not null
  */
-export class Semaphore {
+export class Semaphore implements ISemaphore {
   private permits: number;
   private queue: Array<() => void> = [];
 
   constructor(initialPermits: number) {
     this.permits = initialPermits;
+    this.checkRep();
   }
 
-  /**
-   * Acquire a permit
-   */
+  private checkRep(): void {
+    if (!this.queue) {
+      throw new Error('Invariant violation: queue cannot be null');
+    }
+  }
+
   async acquire(): Promise<void> {
     return new Promise((resolve) => {
       if (this.permits > 0) {
@@ -184,12 +237,10 @@ export class Semaphore {
           resolve();
         });
       }
+      this.checkRep();
     });
   }
 
-  /**
-   * Release a permit
-   */
   release(): void {
     if (this.queue.length > 0) {
       const next = this.queue.shift();
@@ -197,11 +248,9 @@ export class Semaphore {
     } else {
       this.permits++;
     }
+    this.checkRep();
   }
 
-  /**
-   * Execute function with semaphore
-   */
   async withPermit<T>(fn: () => Promise<T> | T): Promise<T> {
     await this.acquire();
     try {
@@ -211,9 +260,6 @@ export class Semaphore {
     }
   }
 
-  /**
-   * Get available permits
-   */
   availablePermits(): number {
     return this.permits;
   }
@@ -221,14 +267,34 @@ export class Semaphore {
 
 /**
  * AtomicCounter - Thread-safe counter
+ * 
+ * Abstraction Function:
+ * AF(value) = The integer value
+ * 
+ * Representation Invariant:
+ * RI: value is a number and mutex is not null
  */
-export class AtomicCounter {
+export class AtomicCounter implements IAtomicCounter {
   private value = 0;
   private mutex = new Mutex();
+
+  constructor() {
+    this.checkRep();
+  }
+
+  private checkRep(): void {
+    if (typeof this.value !== 'number') {
+      throw new Error('Invariant violation: value must be a number');
+    }
+    if (!this.mutex) {
+      throw new Error('Invariant violation: mutex cannot be null');
+    }
+  }
 
   async increment(): Promise<number> {
     return this.mutex.withLock(async () => {
       this.value++;
+      this.checkRep();
       return this.value;
     });
   }
@@ -236,6 +302,7 @@ export class AtomicCounter {
   async decrement(): Promise<number> {
     return this.mutex.withLock(async () => {
       this.value--;
+      this.checkRep();
       return this.value;
     });
   }
@@ -247,6 +314,7 @@ export class AtomicCounter {
   async set(newValue: number): Promise<void> {
     return this.mutex.withLock(async () => {
       this.value = newValue;
+      this.checkRep();
     });
   }
 
@@ -254,6 +322,7 @@ export class AtomicCounter {
     return this.mutex.withLock(async () => {
       if (this.value === expected) {
         this.value = newValue;
+        this.checkRep();
         return true;
       }
       return false;
@@ -263,10 +332,29 @@ export class AtomicCounter {
 
 /**
  * ConcurrentMap - Thread-safe map implementation
+ * 
+ * Abstraction Function:
+ * AF(map) = A dictionary mapping keys K to values V
+ * 
+ * Representation Invariant:
+ * RI: map is instance of Map, lock is instance of ReadWriteLock
  */
-export class ConcurrentMap<K, V> {
+export class ConcurrentMap<K, V> implements IConcurrentMap<K, V> {
   private map = new Map<K, V>();
   private lock = new ReadWriteLock();
+
+  constructor() {
+    this.checkRep();
+  }
+
+  private checkRep(): void {
+    if (!(this.map instanceof Map)) {
+      throw new Error('Invariant violation: underlying storage must be a Map');
+    }
+    if (!(this.lock instanceof ReadWriteLock)) {
+      throw new Error('Invariant violation: lock must be a ReadWriteLock');
+    }
+  }
 
   async get(key: K): Promise<V | undefined> {
     return this.lock.withReadLock(() => this.map.get(key));
