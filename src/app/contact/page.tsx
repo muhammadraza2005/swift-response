@@ -24,11 +24,27 @@ export default function ContactPage() {
     e.preventDefault();
     setStatus('submitting');
 
-    // Simulate form submission
-    setTimeout(() => {
-      setStatus('success');
-      setFormData({ name: '', email: '', message: '' });
-    }, 1000);
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setStatus('success');
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        setStatus('error');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setStatus('error');
+    }
   };
 
   const heroCards = [
@@ -134,6 +150,12 @@ export default function ContactPage() {
               {status === 'success' && (
                 <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
                   <p className="text-green-700 font-semibold">Message sent successfully! We'll get back to you soon.</p>
+                </div>
+              )}
+
+              {status === 'error' && (
+                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+                  <p className="text-red-700 font-semibold">Failed to send message. Please try again.</p>
                 </div>
               )}
             </form>

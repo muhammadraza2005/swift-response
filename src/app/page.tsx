@@ -1,6 +1,7 @@
 'use client';
 
 import Link from "next/link";
+import ContactForm from "@/components/ContactForm";
 
 export default function Home() {
   return (
@@ -210,6 +211,20 @@ export default function Home() {
                 <p className="text-base text-gray-600 leading-relaxed">{feature.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section className="py-20 sm:py-24 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl sm:text-5xl font-bold text-[#333333] mb-4">Get in Touch</h2>
+            <p className="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
+              Have questions or need help? Send us a message and we'll get back to you.
+            </p>
+            
+            <ContactForm />
           </div>
         </div>
       </section>
