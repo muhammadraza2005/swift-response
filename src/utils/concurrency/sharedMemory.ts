@@ -17,6 +17,8 @@ import {
   IConcurrentMap 
 } from './interfaces';
 
+import { assertInvariant, assertNonNull } from '../debug/assert';
+
 // Re-export interfaces for consumers
 export type { IReadWriteLock, IMutex, ISemaphore, IAtomicCounter, IConcurrentMap };
 
@@ -47,11 +49,9 @@ export class ReadWriteLock implements IReadWriteLock {
    * Throws error if invariant is violated
    */
   private checkRep(): void {
-    if (this.readers < 0) {
-      throw new Error('Invariant violation: readers count cannot be negative');
-    }
-    if (this.writer && this.readers > 0) {
-      throw new Error('Invariant violation: cannot have both writer and readers');
+    assertInvariant(this.readers >= 0, 'readers count cannot be negative');
+    if (this.writer) {
+      assertInvariant(this.readers === 0, 'cannot have both writer and readers');
     }
   }
 
@@ -156,9 +156,7 @@ export class Mutex implements IMutex {
   }
 
   private checkRep(): void {
-    if (typeof this.locked !== 'boolean') {
-      throw new Error('Invariant violation: locked state must be boolean');
-    }
+    assertInvariant(typeof this.locked === 'boolean', 'locked state must be boolean');
   }
 
   async acquire(): Promise<void> {
@@ -221,9 +219,7 @@ export class Semaphore implements ISemaphore {
   }
 
   private checkRep(): void {
-    if (!this.queue) {
-      throw new Error('Invariant violation: queue cannot be null');
-    }
+    assertNonNull(this.queue, 'queue cannot be null');
   }
 
   async acquire(): Promise<void> {
@@ -283,12 +279,8 @@ export class AtomicCounter implements IAtomicCounter {
   }
 
   private checkRep(): void {
-    if (typeof this.value !== 'number') {
-      throw new Error('Invariant violation: value must be a number');
-    }
-    if (!this.mutex) {
-      throw new Error('Invariant violation: mutex cannot be null');
-    }
+    assertInvariant(typeof this.value === 'number', 'value must be a number');
+    assertNonNull(this.mutex, 'mutex cannot be null');
   }
 
   async increment(): Promise<number> {
@@ -348,12 +340,8 @@ export class ConcurrentMap<K, V> implements IConcurrentMap<K, V> {
   }
 
   private checkRep(): void {
-    if (!(this.map instanceof Map)) {
-      throw new Error('Invariant violation: underlying storage must be a Map');
-    }
-    if (!(this.lock instanceof ReadWriteLock)) {
-      throw new Error('Invariant violation: lock must be a ReadWriteLock');
-    }
+    assertInvariant(this.map instanceof Map, 'underlying storage must be a Map');
+    assertInvariant(this.lock instanceof ReadWriteLock, 'lock must be a ReadWriteLock');
   }
 
   async get(key: K): Promise<V | undefined> {
