@@ -6,27 +6,43 @@ import { useRouter } from 'next/navigation';
 import { IEmergencyRequest, IVolunteerRegistration } from '@/types/models';
 import VolunteerAction from '@/app/components/VolunteerAction';
 import Link from 'next/link';
-import EmergencyFilterPanel from '@/components/volunteer/EmergencyFilterPanel';
+import EmergencyFilterPanel, { FilterState } from '@/components/volunteer/EmergencyFilterPanel';
 import EmergencyMap from '@/components/maps/EmergencyMap';
+import { emergencyFilterDSL } from '@/utils/dsl/emergencyFilter';
+import { emergencyRequestCache } from '@/utils/cache/emergencyCache';
+import { emergencyUpdateCoordinator } from '@/utils/messaging/emergencyEvents';
+import { ConcurrentOperationTracker } from '@/utils/concurrency/raceDetection';
+
+interface UserData {
+  id: string;
+  user_metadata?: {
+    full_name?: string;
+  };
+}
 
 export default function VolunteerPage() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [requests, setRequests] = useState<IEmergencyRequest[]>([]);
   const [myRegistrations, setMyRegistrations] = useState<Record<string, IVolunteerRegistration>>({});
   const [activeTab, setActiveTab] = useState<'feed' | 'my-volunteering'>('feed');
   
   // Filter state
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<FilterState>({
     emergencyType: 'All',
     urgencyLevel: 'All',
-    location: ''
+    location: '',
+    advancedFilter: ''
   });
 
   // Location and suggestion state
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [showSuggestion, setShowSuggestion] = useState(false);
   const [nearestEmergency, setNearestEmergency] = useState<IEmergencyRequest | null>(null);
+
+  // Concurrency tracking
+  const [operationTracker] = useState(() => new ConcurrentOperationTracker());
+  const [cacheStats, setCacheStats] = useState({ hits: 0, misses: 0, hitRate: 0 });
 
   const router = useRouter();
 
@@ -107,41 +123,108 @@ export default function VolunteerPage() {
   }, [user, requests]);
 
   const fetchData = async (userId: string) => {
-    // Fetch active requests
-    const { data: requestsData } = await supabase
-      .from('emergency_requests')
-      .select('*')
-      .neq('status', 'resolved') // Show pending/assigned
-      .neq('requester_id', userId) // Don't show my own requests
-      .order('created_at', { ascending: false });
+    const opId = `fetch-${Date.now()}`;
+    
+    try {
+      // Track concurrent operation to prevent race conditions
+      await operationTracker.startOperation('emergency-data', opId);
+      
+      // Try to get all data from cache first (shared-memory safe)
+      console.log('🔍 Checking cache for emergency requests...');
+      const hasCache = await emergencyRequestCache.hasData();
+      
+      if (hasCache) {
+        // Cache hit - use cached data immediately
+        const cachedRequests = await emergencyRequestCache.getAllEntries();
+        console.log(`✅ Cache HIT: Found ${cachedRequests.length} requests in cache`);
+        setRequests(cachedRequests);
+        
+        // Update cache stats to show the hits
+        const stats = await emergencyRequestCache.getStats();
+        setCacheStats(stats);
+        
+        return; // Skip database call
+      }
+      
+      // Cache miss - fetch from database
+      console.log('💾 Cache MISS: Loading from database...');
+      const { data: requestsData } = await supabase
+        .from('emergency_requests')
+        .select('*')
+        .neq('status', 'resolved') // Show pending/assigned
+        .neq('requester_id', userId) // Don't show my own requests
+        .order('created_at', { ascending: false });
 
-    if (requestsData) {
-      setRequests(requestsData);
-    }
+      if (requestsData) {
+        console.log(`📥 Caching ${requestsData.length} requests...`);
+        // Populate cache for next time
+        await Promise.all(
+          requestsData.map(async (req: IEmergencyRequest) => {
+            await emergencyRequestCache.set(req.id, req);
+          })
+        );
+        
+        setRequests(requestsData);
+        
+        // Update cache stats
+        const stats = await emergencyRequestCache.getStats();
+        setCacheStats(stats);
+        console.log('📊 Cache stats:', stats);
+        
+        // Publish events for each new request (message-passing pattern)
+        for (const req of requestsData) {
+          await emergencyUpdateCoordinator.processUpdate({
+            type: 'created',
+            requestId: req.id,
+            request: req,
+            timestamp: Date.now(),
+          });
+        }
+      }
 
-    // Fetch my registrations
-    const { data: regData } = await supabase
-      .from('volunteer_registrations')
-      .select('*')
-      .eq('volunteer_id', userId);
+      // Fetch my registrations
+      const { data: regData } = await supabase
+        .from('volunteer_registrations')
+        .select('*')
+        .eq('volunteer_id', userId);
 
-    if (regData) {
-      const regMap: Record<string, IVolunteerRegistration> = {};
-      regData.forEach((r: IVolunteerRegistration) => {
-        regMap[r.request_id] = r;
-      });
-      setMyRegistrations(regMap);
+      if (regData) {
+        const regMap: Record<string, IVolunteerRegistration> = {};
+        regData.forEach((r: IVolunteerRegistration) => {
+          regMap[r.request_id] = r;
+        });
+        setMyRegistrations(regMap);
+      }
+    } finally {
+      // Always release operation lock
+      await operationTracker.finishOperation('emergency-data', opId);
     }
   };
 
-  const onRegistrationSuccess = (newReg: IVolunteerRegistration) => {
+  const onRegistrationSuccess = async (newReg: IVolunteerRegistration) => {
+    // Use atomic update to prevent race conditions
     setMyRegistrations(prev => ({
       ...prev,
       [newReg.request_id]: newReg
     }));
+    
+    // Update cache atomically
+    await emergencyRequestCache.update(newReg.request_id, (req) => ({
+      ...req,
+      status: 'assigned'
+    }));
+    
+    // Publish status change event (message-passing)
+    await emergencyUpdateCoordinator.processUpdate({
+      type: 'status_changed',
+      requestId: newReg.request_id,
+      oldStatus: 'pending',
+      newStatus: 'assigned',
+      timestamp: Date.now(),
+    });
   };
 
-  const handleFilterChange = (field: 'emergencyType' | 'urgencyLevel' | 'location', value: string) => {
+  const handleFilterChange = (field: keyof FilterState, value: string) => {
     setFilters(prev => ({
       ...prev,
       [field]: value
@@ -152,7 +235,8 @@ export default function VolunteerPage() {
     setFilters({
       emergencyType: 'All',
       urgencyLevel: 'All',
-      location: ''
+      location: '',
+      advancedFilter: ''
     });
   };
 
@@ -211,7 +295,8 @@ export default function VolunteerPage() {
     
     // Urgency level filter (if urgency field exists)
     if (filters.urgencyLevel !== 'All') {
-      const reqUrgency = (req as any).urgency || 'Medium'; // Default to Medium if not set
+      const reqWithUrgency = req as IEmergencyRequest & { urgency?: string };
+      const reqUrgency = reqWithUrgency.urgency || 'Medium';
       if (reqUrgency !== filters.urgencyLevel) {
         return false;
       }
@@ -219,7 +304,7 @@ export default function VolunteerPage() {
     
     // Location filter
     if (filters.location) {
-      const address = (req.location as any)?.address || '';
+      const address = (req.location as { address: string }).address || '';
       if (!address.toLowerCase().includes(filters.location.toLowerCase())) {
         return false;
       }
@@ -227,6 +312,26 @@ export default function VolunteerPage() {
     
     return true;
   });
+
+  // Apply advanced DSL filter if present
+  if (filters.advancedFilter && filters.advancedFilter.trim()) {
+    try {
+      const validation = emergencyFilterDSL.validate(filters.advancedFilter);
+      if (validation.valid) {
+        displayedRequests = emergencyFilterDSL.filter(
+          displayedRequests,
+          filters.advancedFilter,
+          {
+            userLat: userLocation?.lat,
+            userLon: userLocation?.lng,
+          }
+        );
+      }
+    } catch (error) {
+      // Silently ignore filter errors while typing
+      console.debug('Filter expression error:', error);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -335,12 +440,51 @@ export default function VolunteerPage() {
         {/* Two-column layout: Filter panel + Requests */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Filter Panel - Left Column */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-4">
             <EmergencyFilterPanel
               filters={filters}
               onFilterChange={handleFilterChange}
               onClearFilters={handleClearFilters}
             />
+            
+            {/* Cache Stats - Concurrency Feature */}
+            <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-4 shadow-sm border border-purple-100">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">⚡</span>
+                <h3 className="text-sm font-bold text-gray-800">Concurrency Cache</h3>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Cache Hits:</span>
+                  <span className="font-bold text-green-600">{cacheStats.hits}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Cache Misses:</span>
+                  <span className="font-bold text-orange-600">{cacheStats.misses}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Hit Rate:</span>
+                  <span className="font-bold text-blue-600">{(cacheStats.hitRate * 100).toFixed(1)}%</span>
+                </div>
+              </div>
+              <div className="mt-3 pt-3 border-t border-purple-200">
+                <p className="text-xs text-gray-500 leading-relaxed mb-3">
+                  Thread-safe cache prevents race conditions using ReadWriteLock & ConcurrentMap
+                </p>
+                <button
+                  onClick={async () => {
+                    await emergencyRequestCache.clear();
+                    const stats = await emergencyRequestCache.getStats();
+                    setCacheStats(stats);
+                    console.log('🗑️ Cache cleared! Refresh to see cache miss.');
+                    alert('Cache cleared! Refresh the page to load from database.');
+                  }}
+                  className="w-full bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold py-2 px-3 rounded-lg transition-colors border border-red-200"
+                >
+                  🗑️ Clear Cache (Test)
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Requests - Right Column */}

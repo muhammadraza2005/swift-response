@@ -1,4 +1,6 @@
 import { IEmergencyRequest } from '@/types/models';
+import { EmergencyRequestFSM, EmergencyRequestState } from '@/utils/automata/stateMachine';
+import { useState } from 'react';
 
 interface RequestCardProps {
   request: any;
@@ -7,10 +9,16 @@ interface RequestCardProps {
 }
 
 export default function RequestCard({ request: req, onEdit, onDelete }: RequestCardProps) {
+  const [showFSM, setShowFSM] = useState(false);
+  
+  // Initialize FSM with current state
+  const fsm = new EmergencyRequestFSM(req.status as EmergencyRequestState);
+  const fsmInfo = fsm.getStateInfo();
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <div className="flex justify-between items-start mb-4">
-        <div>
+        <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
             <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${req.type === 'Medical' ? 'bg-red-100 text-red-700' :
                 req.type === 'Fire' ? 'bg-orange-100 text-orange-700' :
@@ -24,6 +32,15 @@ export default function RequestCard({ request: req, onEdit, onDelete }: RequestC
               }`}>
               {req.status}
             </span>
+            {fsmInfo.isAccepting && <span className="text-green-500 text-xs">✓ Complete</span>}
+            {fsmInfo.isRejecting && <span className="text-red-500 text-xs">✗ Cancelled</span>}
+            <button
+              onClick={() => setShowFSM(!showFSM)}
+              className="ml-2 text-xs text-blue-600 hover:text-blue-800"
+              title="Show state machine"
+            >
+              🔄 FSM
+            </button>
           </div>
           <p className="text-gray-800 font-medium mb-1 text-lg">{req.description}</p>
           <p className="text-gray-500 text-sm">📍 {(req.location as any).address}</p>
@@ -32,6 +49,42 @@ export default function RequestCard({ request: req, onEdit, onDelete }: RequestC
           {new Date(req.created_at).toLocaleDateString()}
         </div>
       </div>
+
+      {/* FSM State Machine Visualization */}
+      {showFSM && (
+        <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+          <div className="text-xs font-bold text-gray-700 mb-2">🤖 Finite State Machine (Automaton)</div>
+          <div className="space-y-2 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-gray-600">Current State:</span>
+              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded font-mono">{fsmInfo.state}</span>
+              {fsmInfo.isTerminal && (
+                <span className="text-gray-500">(Terminal State)</span>
+              )}
+            </div>
+            <div>
+              <span className="font-semibold text-gray-600">Valid Transitions:</span>
+              <div className="flex flex-wrap gap-1 mt-1">
+                {fsmInfo.validActions.length > 0 ? (
+                  fsmInfo.validActions.map(action => (
+                    <span key={action} className="px-2 py-0.5 bg-green-100 text-green-700 rounded font-mono">
+                      {action}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-gray-500 italic">No transitions (terminal)</span>
+                )}
+              </div>
+            </div>
+            <div className="pt-2 border-t border-blue-200 text-gray-600">
+              <span className="font-semibold">State Flow:</span>
+              <div className="mt-1 font-mono text-xs">
+                pending → assigned → in_progress → resolved
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Volunteers Section */}
       <div className="mt-6 pt-4 border-t border-gray-50">
