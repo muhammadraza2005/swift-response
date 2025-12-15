@@ -1,5 +1,7 @@
 /**
  * Parser - Converts string expressions into AST structures
+ * 
+ * Formal Specification Enforced.
  */
 
 import {
@@ -12,6 +14,7 @@ import {
   ConditionalNode,
   MemberAccessNode,
 } from './ast';
+import { assert, assertNonNull } from '../debug/assert';
 
 enum TokenType {
   NUMBER = 'NUMBER',
@@ -170,11 +173,31 @@ export class Parser {
   private position = 0;
   private tokens: Token[] = [];
 
+  /**
+   * Parses a string expression into an Abstract Syntax Tree (AST).
+   * 
+   * @requires input is not null or undefined (Checked).
+   * @modifies this.tokens, this.position (Internal state).
+   * @effects Returns a complete ASTNode representing the input expression.
+   * @throws {AssertionError} if input is null/undefined.
+   * @throws {Error} if the input string contains invalid syntax.
+   */
   parse(input: string): ASTNode {
+    assertNonNull(input, 'Input expression cannot be null or undefined');
+    
     const lexer = new Lexer(input);
     this.tokens = lexer.tokenize();
     this.position = 0;
-    return this.parseExpression();
+    
+    const ast = this.parseExpression();
+    
+    // Check that we consumed all tokens (except EOF)
+    // This enforces "Strong" specification: valid input must be FULLY consumed.
+    if (this.current().type !== TokenType.EOF) {
+        throw new Error(`Unexpected token at end of expression: ${this.current().value}`);
+    }
+    
+    return ast;
   }
 
   private current(): Token {
