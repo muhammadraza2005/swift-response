@@ -1,0 +1,34 @@
+# Software Engineering Principles Implementation
+
+- [x] **Abstraction & ADTs**
+    - [x] Define Interfaces (`ILock`, `IConcurrentMap`) <!-- id: 0 -->
+    - [x] Implement ADTs with `checkRep()` (`SharedMemory`, `EmergencyCache`) <!-- id: 1 -->
+    - [x] Document Design (`docs/ADT_DESIGN.md`) <!-- id: 2 -->
+- [x] **Recursion**
+    - [x] Implement `ConstantFoldingOptimizer` (Visitor Pattern) <!-- id: 3 -->
+    - [x] Integrate into `EmergencyFilterDSL` <!-- id: 4 -->
+    - [x] Document Recursion (`docs/RECURSION_IMPLEMENTATION.md`) <!-- id: 5 -->
+- [x] **Mutability & Aliasing**
+    - [x] Implement Defensive Copying (`EmergencyRequestCache`) <!-- id: 6 -->
+    - [x] Implement Immutable Collections (`ImmutableList`) <!-- id: 7 -->
+    - [x] Document Mutability (`docs/MUTABILITY_DESIGN.md`) <!-- id: 8 -->
+- [x] **Debugging & Assertions**
+    - [x] Create Assertion Utility (`src/utils/debug/assert.ts`) <!-- id: 9 -->
+    - [x] Apply Assertions to ADTs <!-- id: 10 -->
+    - [x] Document Debugging Practices (`docs/DEBUGGING_PRACTICES.md`) <!-- id: 11 -->
+- [x] **Method Specifications**
+    - [x] Define Specification Format (`docs/SPECIFICATION_FORMAT.md`) <!-- id: 12 -->
+    - [x] Add Specs to `Parser` <!-- id: 13 -->
+    - [x] Verify Specs (`parser_spec_test.ts`) <!-- id: 14 -->
+- [x] **Code Review & Testing**
+    - [x] Define Quality Standards (`docs/CODE_QUALITY_STANDARDS.md`) <!-- id: 15 -->
+    - [x] Refactor `Evaluator` for Modularity <!-- id: 16 -->
+    - [x] Implement Test Runner & Suite (`evaluator.test.ts`) <!-- id: 17 -->
+- [x] **Static Checking & Validation**
+    - [x] Define Validation Strategy (`docs/VALIDATION_STRATEGY.md`) <!-- id: 18 -->
+    - [x] Implement Test-First Algebraic Simplification <!-- id: 19 -->
+    - [x] Verify Static Checks <!-- id: 20 -->
+- [x] **UML Modeling**
+    - [x] Create Class, Sequence, and State Diagrams (`docs/UML_MODELS.md`) <!-- id: 21 -->
+- [x] **Final Verification**
+    - [x] Run Dev Server (`npm run dev`) <!-- id: 22 -->

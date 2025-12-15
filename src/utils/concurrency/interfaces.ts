@@ -11,6 +11,11 @@ export interface ILock {
     isLocked?(): boolean;
 }
 
+// Mutex interface (Mutual Exclusion)
+export interface IMutex extends ILock {
+    isLocked(): boolean;
+}
+
 // ReadWriteLock interface
 export interface IReadWriteLock {
     acquireRead(): Promise<void>;
