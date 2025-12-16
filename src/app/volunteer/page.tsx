@@ -126,28 +126,28 @@ export default function VolunteerPage() {
 
   const fetchData = async (userId: string) => {
     const opId = `fetch-${Date.now()}`;
-    
+
     try {
       // Track concurrent operation to prevent race conditions
       await operationTracker.startOperation('emergency-data', opId);
-      
+
       // Try to get all data from cache first (shared-memory safe)
       console.log('🔍 Checking cache for emergency requests...');
       const hasCache = await emergencyRequestCache.hasData();
-      
+
       if (hasCache) {
         // Cache hit - use cached data immediately
         const cachedRequests = await emergencyRequestCache.getAllEntries();
         console.log(`✅ Cache HIT: Found ${cachedRequests.length} requests in cache`);
         setRequests(cachedRequests);
-        
+
         // Update cache stats to show the hits
         const stats = await emergencyRequestCache.getStats();
         setCacheStats(stats);
-        
+
         return; // Skip database call
       }
-      
+
       // Cache miss - fetch from database
       console.log('💾 Cache MISS: Loading from database...');
       const { data: requestsData } = await supabase
@@ -165,14 +165,14 @@ export default function VolunteerPage() {
             await emergencyRequestCache.set(req.id, req);
           })
         );
-        
+
         setRequests(requestsData);
-        
+
         // Update cache stats
         const stats = await emergencyRequestCache.getStats();
         setCacheStats(stats);
         console.log('📊 Cache stats:', stats);
-        
+
         // Publish events for each new request (message-passing pattern)
         for (const req of requestsData) {
           await emergencyUpdateCoordinator.processUpdate({
@@ -209,13 +209,13 @@ export default function VolunteerPage() {
       ...prev,
       [newReg.request_id]: newReg
     }));
-    
+
     // Update cache atomically
     await emergencyRequestCache.update(newReg.request_id, (req) => ({
       ...req,
       status: 'assigned'
     }));
-    
+
     // Publish status change event (message-passing)
     await emergencyUpdateCoordinator.processUpdate({
       type: 'status_changed',
@@ -448,45 +448,6 @@ export default function VolunteerPage() {
               onFilterChange={handleFilterChange}
               onClearFilters={handleClearFilters}
             />
-            
-            {/* Cache Stats - Concurrency Feature */}
-            <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-4 shadow-sm border border-purple-100">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg">⚡</span>
-                <h3 className="text-sm font-bold text-gray-800">Concurrency Cache</h3>
-              </div>
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Cache Hits:</span>
-                  <span className="font-bold text-green-600">{cacheStats.hits}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Cache Misses:</span>
-                  <span className="font-bold text-orange-600">{cacheStats.misses}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Hit Rate:</span>
-                  <span className="font-bold text-blue-600">{(cacheStats.hitRate * 100).toFixed(1)}%</span>
-                </div>
-              </div>
-              <div className="mt-3 pt-3 border-t border-purple-200">
-                <p className="text-xs text-gray-500 leading-relaxed mb-3">
-                  Thread-safe cache prevents race conditions using ReadWriteLock & ConcurrentMap
-                </p>
-                <button
-                  onClick={async () => {
-                    await emergencyRequestCache.clear();
-                    const stats = await emergencyRequestCache.getStats();
-                    setCacheStats(stats);
-                    console.log('🗑️ Cache cleared! Refresh to see cache miss.');
-                    alert('Cache cleared! Refresh the page to load from database.');
-                  }}
-                  className="w-full bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold py-2 px-3 rounded-lg transition-colors border border-red-200"
-                >
-                  🗑️ Clear Cache (Test)
-                </button>
-              </div>
-            </div>
           </div>
 
           {/* Requests - Right Column */}
