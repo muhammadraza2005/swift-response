@@ -1,17 +1,21 @@
+import { LucideIcon } from 'lucide-react';
+
 interface HeroCardProps {
   title: string;
-  icon: string;
+  icon: string | LucideIcon;
   delay: number;
 }
 
-export default function HeroCard({ title, icon, delay }: HeroCardProps) {
+export default function HeroCard({ title, icon: Icon, delay }: HeroCardProps) {
   return (
-    <div 
+    <div
       className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 animate-fade-in-up"
       style={{ animationDelay: `${delay}ms` }}
     >
       <div className="flex flex-col items-center text-center gap-3">
-        <div className="text-4xl">{icon}</div>
+        <div className="text-4xl text-white">
+          {typeof Icon === 'string' ? Icon : <Icon className="w-10 h-10" />}
+        </div>
         <p className="text-white font-semibold text-base sm:text-lg">{title}</p>
       </div>
     </div>

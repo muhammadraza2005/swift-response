@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
+import Loader from '@/components/Loader';
 
 interface LocationPickerProps {
   onLocationSelect: (lat: number, lng: number, address: string) => void;
@@ -77,8 +78,22 @@ export default function LocationPicker({ onLocationSelect, initialLocation }: Lo
           });
         },
         (error) => {
-          console.error('Error getting location:', error);
-          alert('Unable to get your current location. Please click on the map to select a location.');
+          let message = 'Unable to get your current location.';
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              message = 'Location access denied. Please enable location permissions and try again.';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              message = 'Location information is unavailable. Please check your device settings.';
+              break;
+            case error.TIMEOUT:
+              message = 'Location request timed out. Please try again.';
+              break;
+            default:
+              message = 'An unknown error occurred while retrieving location.';
+              break;
+          }
+          alert(message + ' You can click on the map to select a location manually.');
         }
       );
     } else {
@@ -93,10 +108,7 @@ export default function LocationPicker({ onLocationSelect, initialLocation }: Lo
   if (!isLoaded) {
     return (
       <div className="w-full h-[400px] bg-gray-100 rounded-xl flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#008C5A] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading map...</p>
-        </div>
+        <Loader className="min-h-0" text="Loading map..." />
       </div>
     );
   }

@@ -152,3 +152,36 @@ create policy "Requesters can see volunteers for their requests."
     )
   );
 
+-- 6. UNIFIED INCIDENTS TABLE (NEW)
+create table public.incidents (
+  id uuid default uuid_generate_v4() primary key,
+  device_emergency_id text not null, -- Anonymous ID from localForage
+  phone_number text, -- Optional, from Auth or SMS/Call metadata
+  latitude double precision not null,
+  longitude double precision not null,
+  location_confidence text check (location_confidence in ('high', 'cell-tower', 'unknown')) not null,
+  source_channel text check (source_channel in ('data', 'call', 'sms')) not null,
+  status text check (status in ('pending', 'acknowledged', 'resolved')) default 'pending',
+  voice_url text, -- Optional voice note URL
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Index for faster merging lookup
+create index idx_incidents_device_id on public.incidents(device_emergency_id);
+create index idx_incidents_phone on public.incidents(phone_number);
+
+-- RLS for Incidents
+alter table public.incidents enable row level security;
+
+-- Allow INSERT from Anon (Edge Function/API will use Service Key, but for client-direct we might need this OR just rely on API)
+-- For this plan, we use an Open API endpoint with backend logic, so RLS might be bypassed by Service Key. 
+-- However, we allow SELECT for Volunteers.
+create policy "Volunteers and Admins can view incidents."
+  on public.incidents for select
+  using (
+    exists (
+      select 1 from public.profiles
+      where profiles.id = auth.uid()
+      and profiles.role in ('volunteer', 'ngo_admin')
+    )
+  );

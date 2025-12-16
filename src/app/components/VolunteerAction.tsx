@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { supabase } from '@/utils/supabase';
 import { IEmergencyRequest, IVolunteerRegistration } from '@/types/models';
+import { HandHelping, CheckCircle } from 'lucide-react';
 
 interface VolunteerActionProps {
   request: IEmergencyRequest;
@@ -21,7 +22,8 @@ export default function VolunteerAction({ request, userId, existingRegistration,
     return (
       <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
         <div className="flex items-center text-green-700 font-bold mb-2">
-          <span>✅ You have volunteered</span>
+          <CheckCircle className="w-5 h-5 mr-2" />
+          <span>You have volunteered</span>
         </div>
         {existingRegistration.message && (
           <p className="text-green-600 text-sm italic">" {existingRegistration.message} "</p>
@@ -67,7 +69,8 @@ export default function VolunteerAction({ request, userId, existingRegistration,
           disabled={loading}
           className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors flex items-center gap-2"
         >
-          <span>✋</span> Volunteer to Help
+          <HandHelping className="w-5 h-5" />
+          <span>Volunteer to Help</span>
         </button>
       ) : (
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 animate-fade-in-up">

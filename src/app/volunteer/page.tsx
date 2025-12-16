@@ -19,6 +19,8 @@ interface UserData {
     full_name?: string;
   };
 }
+import { Heart, Zap, Users, MapPin } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 export default function VolunteerPage() {
   const [user, setUser] = useState<UserData | null>(null);
@@ -26,7 +28,7 @@ export default function VolunteerPage() {
   const [requests, setRequests] = useState<IEmergencyRequest[]>([]);
   const [myRegistrations, setMyRegistrations] = useState<Record<string, IVolunteerRegistration>>({});
   const [activeTab, setActiveTab] = useState<'feed' | 'my-volunteering'>('feed');
-  
+
   // Filter state
   const [filters, setFilters] = useState<FilterState>({
     emergencyType: 'All',
@@ -51,7 +53,7 @@ export default function VolunteerPage() {
     const R = 6371; // Radius of the Earth in km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
+    const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
       Math.sin(dLon / 2) * Math.sin(dLon / 2);
@@ -241,7 +243,7 @@ export default function VolunteerPage() {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center text-primary font-bold">Loading...</div>;
+    return <Loader />;
   }
 
   // Marketing Page for Unauthenticated Users
@@ -262,17 +264,17 @@ export default function VolunteerPage() {
           <h2 className="text-3xl font-bold text-gray-800">Why Join?</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="p-6 bg-gray-50 rounded-xl">
-              <div className="text-4xl mb-4">❤️</div>
+              <div className="text-4xl mb-4 flex justify-center text-red-500"><Heart className="w-10 h-10" /></div>
               <h3 className="text-xl font-bold mb-2">Help Others</h3>
               <p className="text-gray-600">Make a direct impact in your local community.</p>
             </div>
             <div className="p-6 bg-gray-50 rounded-xl">
-              <div className="text-4xl mb-4">⚡</div>
+              <div className="text-4xl mb-4 flex justify-center text-yellow-500"><Zap className="w-10 h-10" /></div>
               <h3 className="text-xl font-bold mb-2">Fast Response</h3>
               <p className="text-gray-600">Get notified immediately when help is needed nearby.</p>
             </div>
             <div className="p-6 bg-gray-50 rounded-xl">
-              <div className="text-4xl mb-4">🤝</div>
+              <div className="text-4xl mb-4 flex justify-center text-blue-500"><Users className="w-10 h-10" /></div>
               <h3 className="text-xl font-bold mb-2">Community</h3>
               <p className="text-gray-600">Connect with other volunteers and verified NGOs.</p>
             </div>
@@ -285,14 +287,14 @@ export default function VolunteerPage() {
   // Authenticated Volunteer Dashboard
   const myVolunteeredRequests = requests.filter(r => myRegistrations[r.id]);
   let displayedRequests = activeTab === 'feed' ? requests : myVolunteeredRequests;
-  
+
   // Apply filters
   displayedRequests = displayedRequests.filter(req => {
     // Emergency type filter
     if (filters.emergencyType !== 'All' && req.type !== filters.emergencyType) {
       return false;
     }
-    
+
     // Urgency level filter (if urgency field exists)
     if (filters.urgencyLevel !== 'All') {
       const reqWithUrgency = req as IEmergencyRequest & { urgency?: string };
@@ -301,7 +303,7 @@ export default function VolunteerPage() {
         return false;
       }
     }
-    
+
     // Location filter
     if (filters.location) {
       const address = (req.location as { address: string }).address || '';
@@ -309,7 +311,7 @@ export default function VolunteerPage() {
         return false;
       }
     }
-    
+
     return true;
   });
 
@@ -344,8 +346,8 @@ export default function VolunteerPage() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-2xl">
-                    📍
+                  <div className="w-12 h-12  bg-opacity-20 rounded-full flex items-center justify-center">
+                    <MapPin className="w-6 h-6 text-white" />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold">Emergency Nearby!</h3>
@@ -375,7 +377,7 @@ export default function VolunteerPage() {
                 </div>
                 <p className="text-gray-700 mb-3 line-clamp-3">{nearestEmergency.description}</p>
                 <div className="flex items-start gap-2 text-sm text-gray-600">
-                  <span className="text-lg">📍</span>
+                  <MapPin className="w-5 h-5 mt-0.5" />
                   <span>{(nearestEmergency.location as any)?.address || 'Location not specified'}</span>
                 </div>
               </div>
@@ -490,74 +492,73 @@ export default function VolunteerPage() {
           {/* Requests - Right Column */}
           <div className="lg:col-span-3">
 
-        {displayedRequests.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
-            <p className="text-gray-500 text-lg">
-              {activeTab === 'feed' 
-                ? 'No active emergency requests at the moment. Good news!' 
-                : 'You haven\'t volunteered for any requests yet.'}
-            </p>
-            {activeTab === 'my-volunteering' && (
-              <button 
-                onClick={() => setActiveTab('feed')}
-                className="mt-4 text-[#008C5A] font-bold hover:underline"
-              >
-                Browse Open Requests
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="grid gap-6">
-            {displayedRequests.map(req => (
-              <div 
-                key={req.id} 
-                id={`emergency-${req.id}`}
-                className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
-              >
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center gap-3">
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
-                        req.type === 'Medical' ? 'bg-red-100 text-red-700' :
-                        req.type === 'Fire' ? 'bg-orange-100 text-orange-700' :
-                        req.type === 'Flood' ? 'bg-blue-100 text-blue-700' :
-                        'bg-gray-100 text-gray-700'
-                      }`}>
-                        {req.type}
-                      </span>
-                      <span className="text-gray-400 text-sm">•</span>
-                      <span className="text-gray-500 text-sm">{new Date(req.created_at).toLocaleString()}</span>
-                    </div>
-                    {myRegistrations[req.id] && (
-                      <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full border border-green-200">
-                        Volunteered
-                      </span>
-                    )}
-                  </div>
+            {displayedRequests.length === 0 ? (
+              <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
+                <p className="text-gray-500 text-lg">
+                  {activeTab === 'feed'
+                    ? 'No active emergency requests at the moment. Good news!'
+                    : 'You haven\'t volunteered for any requests yet.'}
+                </p>
+                {activeTab === 'my-volunteering' && (
+                  <button
+                    onClick={() => setActiveTab('feed')}
+                    className="mt-4 text-[#008C5A] font-bold hover:underline"
+                  >
+                    Browse Open Requests
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="grid gap-6">
+                {displayedRequests.map(req => (
+                  <div
+                    key={req.id}
+                    id={`emergency-${req.id}`}
+                    className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+                  >
+                    <div className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center gap-3">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${req.type === 'Medical' ? 'bg-red-100 text-red-700' :
+                            req.type === 'Fire' ? 'bg-orange-100 text-orange-700' :
+                              req.type === 'Flood' ? 'bg-blue-100 text-blue-700' :
+                                'bg-gray-100 text-gray-700'
+                            }`}>
+                            {req.type}
+                          </span>
+                          <span className="text-gray-400 text-sm">•</span>
+                          <span className="text-gray-500 text-sm">{new Date(req.created_at).toLocaleString()}</span>
+                        </div>
+                        {myRegistrations[req.id] && (
+                          <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full border border-green-200">
+                            Volunteered
+                          </span>
+                        )}
+                      </div>
 
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">{req.description}</h3>
-                  
-                  <div className="flex items-start gap-2 text-gray-600 mb-4">
-                    <span className="mt-1">📍</span>
-                    <span>{(req.location as any).address || 'Location provided'}</span>
-                  </div>
+                      <h3 className="text-xl font-bold text-gray-800 mb-2">{req.description}</h3>
 
-                  {/* Requester Info could be fetched if not available in req, but req doesn't have requester name, only ID. 
+                      <div className="flex items-start gap-2 text-gray-600 mb-4">
+                        <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                        <span>{(req.location as any).address || 'Location provided'}</span>
+                      </div>
+
+                      {/* Requester Info could be fetched if not available in req, but req doesn't have requester name, only ID. 
                       However, for simplicity I'll skip fetching requester name for now unless I join it.
                       The requirements say "requester name". I might need to fetch profiles.
                   */}
-                  
-                  <VolunteerAction 
-                    request={req} 
-                    userId={user.id}
-                    existingRegistration={myRegistrations[req.id] || null}
-                    onRegistrationSuccess={onRegistrationSuccess}
-                  />
-                </div>
+
+                      <VolunteerAction
+                        request={req}
+                        userId={user.id}
+                        existingRegistration={myRegistrations[req.id] || null}
+                        onRegistrationSuccess={onRegistrationSuccess}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
+            )}
           </div>
         </div>
       </div>
