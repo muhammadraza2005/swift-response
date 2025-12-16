@@ -6,6 +6,7 @@ import AuthButton from "./components/AuthButton";
 import MobileNav from "./components/MobileNav";
 import Logo from "@/components/Logo";
 import Providers from "./providers";
+import NewsButton from "@/components/NewsButton";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -113,6 +114,9 @@ export default function RootLayout({
           </header>
 
           <main className="min-h-screen">{children}</main>
+
+          {/* Floating News Button */}
+          <NewsButton />
 
           <footer className="bg-[#333333] text-white py-8">
             <div className="container mx-auto px-4 text-center flex flex-col items-center">

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import ContactForm from "@/components/ContactForm";
+import SafetyVideosSection from "@/components/SafetyVideosSection";
 import {
   Waves,
   Home as HomeIcon,
@@ -203,8 +204,11 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Safety Videos Section */}
+      <SafetyVideosSection />
+
       {/* Contact Section */}
-      <section className="py-20 sm:py-24 bg-white">
+      <section className="py-20 sm:py-24 bg-[#fafafa]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 tracking-tight">Get in Touch</h2>
