@@ -44,7 +44,7 @@ export default function SafetyCheckIn() {
   // Get user location (only if logged in)
   useEffect(() => {
     if (!user) return;
-    
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -68,7 +68,7 @@ export default function SafetyCheckIn() {
       try {
         // Fetch recent emergencies (last 24 hours)
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-        
+
         const { data: emergencies, error } = await supabase
           .from('emergency_requests')
           .select('*')
@@ -122,7 +122,7 @@ export default function SafetyCheckIn() {
     try {
       // Save safety status
       saveSafetyStatus(nearbyEmergency.id, isSafe);
-      
+
       // Mark as asked
       markEmergencyAsAsked(nearbyEmergency.id);
 
@@ -155,11 +155,11 @@ export default function SafetyCheckIn() {
 
   const distance = userLocation
     ? calculateDistance(
-        userLocation.lat,
-        userLocation.lng,
-        (nearbyEmergency.location as any).lat,
-        (nearbyEmergency.location as any).lng
-      ).toFixed(1)
+      userLocation.lat,
+      userLocation.lng,
+      (nearbyEmergency.location as any).lat,
+      (nearbyEmergency.location as any).lng
+    ).toFixed(1)
     : null;
 
   return (
@@ -225,14 +225,14 @@ export default function SafetyCheckIn() {
               disabled={responding}
               className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-               I'm Safe
+              I'm Safe
             </button>
             <button
               onClick={() => handleResponse(false)}
               disabled={responding}
               className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-               Need Help
+              Need Help
             </button>
           </div>
 

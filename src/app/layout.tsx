@@ -7,7 +7,7 @@ import MobileNav from "./components/MobileNav";
 import Logo from "@/components/Logo";
 import Providers from "./providers";
 import NewsButton from "@/components/NewsButton";
-import SafetyCheckIn from "@/components/SafetyCheckIn";
+import ClientOnlySafetyCheckIn from "@/components/ClientOnlySafetyCheckIn";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -120,7 +120,7 @@ export default function RootLayout({
           <NewsButton />
 
           {/* Safety Check-In */}
-          <SafetyCheckIn />
+          <ClientOnlySafetyCheckIn />
 
           <footer className="bg-[#333333] text-white py-8">
             <div className="container mx-auto px-4 text-center flex flex-col items-center">

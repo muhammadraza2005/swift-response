@@ -13,6 +13,7 @@
     "@serwist/next": "^9.2.3",
     "@supabase/supabase-js": "^2.86.0",
     "@tanstack/react-query": "^5.90.12",
+    "date-fns": "^4.1.0",
     "localforage": "^1.10.0",
     "lucide-react": "^0.555.0",
     "next": "16.0.5",
@@ -20,7 +21,7 @@
     "react-dom": "19.2.0",
     "uuid": "^13.0.0"
   },
-  "devDependencies": { 
+  "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

@@ -7,6 +7,7 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardRequestsSection from '@/components/dashboard/DashboardRequestsSection';
 import EmergencyMap from '@/components/maps/EmergencyMap';
 import Loader from '@/components/Loader';
+import LiveIncidentsSection from '@/components/dashboard/LiveIncidentsSection';
 
 export default function DashboardPage() {
   const [requests, setRequests] = useState<any[]>([]); // Changed IEmergencyRequest[] to any[] as IEmergencyRequest import was removed
@@ -79,6 +80,9 @@ export default function DashboardPage() {
       />
 
       <div className="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        {/* Live Incidents Section (High Priority) */}
+        <LiveIncidentsSection />
+
         {/* Emergency Map */}
         {requests.length > 0 && (
           <div className="mb-8">
